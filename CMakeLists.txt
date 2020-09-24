@@ -34,6 +34,7 @@ library_build_options(${PROJECT_NAME} STATIC SHARED EXAMPLE TEST)
 set(headers
     include/rsce/load_resource_from_file.hpp
     include/rsce/resource_store.hpp
+    include/rsce/basic_resource_manager.hpp
 )
 
 # Sources:
