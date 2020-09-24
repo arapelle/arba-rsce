@@ -38,7 +38,7 @@ int main()
     stream.close();
 
     rsce::basic_resource_manager rmanager;
-    text& tale = rmanager.get_ref<text>(std::filesystem::temp_directory_path()/"rsce/rsc/tale.txt");
+    text& tale = rmanager.get<text>(std::filesystem::temp_directory_path()/"rsce/rsc/tale.txt");
 
     std::cout << tale.contents << std::endl;
 

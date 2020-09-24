@@ -14,15 +14,15 @@ public:
     inline vlfs::virtual_filesystem* virtual_filesystem() { return vlfs_; }
 
     template <class resource>
-    inline std::shared_ptr<resource> get(const std::filesystem::path& rsc_path)
+    inline std::shared_ptr<resource> get_shared(const std::filesystem::path& rsc_path)
     {
-        return this->get_or_create_resource_store_<resource>().get(vlfs_->real_path(rsc_path), *this);
+        return this->get_or_create_resource_store_<resource>().get_shared(vlfs_->real_path(rsc_path), *this);
     }
 
     template <class resource>
-    inline resource& get_ref(const std::filesystem::path& rsc_path)
+    inline resource& get(const std::filesystem::path& rsc_path)
     {
-        std::shared_ptr<resource> rsc_sptr = get<resource>(rsc_path);
+        std::shared_ptr<resource> rsc_sptr = get_shared<resource>(rsc_path);
         assert(rsc_sptr);
         return *rsc_sptr;
     }

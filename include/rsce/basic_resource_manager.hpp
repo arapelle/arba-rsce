@@ -15,15 +15,15 @@ public:
     basic_resource_manager& operator=(const basic_resource_manager&) = delete;
 
     template <class resource>
-    inline std::shared_ptr<resource> get(const std::filesystem::path& rsc_path)
+    inline std::shared_ptr<resource> get_shared(const std::filesystem::path& rsc_path)
     {
-        return get_or_create_resource_store_<resource>().get(rsc_path, *this);
+        return get_or_create_resource_store_<resource>().get_shared(rsc_path, *this);
     }
 
     template <class resource>
-    inline resource& get_ref(const std::filesystem::path& rsc_path)
+    inline resource& get(const std::filesystem::path& rsc_path)
     {
-        std::shared_ptr<resource> rsc_sptr = get<resource>(rsc_path);
+        std::shared_ptr<resource> rsc_sptr = get_shared<resource>(rsc_path);
         assert(rsc_sptr);
         return *rsc_sptr;
     }

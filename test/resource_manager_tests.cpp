@@ -99,8 +99,8 @@ TEST(resource_manager_tests, test_get)
 
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
-    text_sptr koro_sptr = rmanager.get<text>(rsc/"koro.txt");
-    text_sptr koro_sptr_2 = rmanager.get<text>(rsc/"koro.txt");
+    text_sptr koro_sptr = rmanager.get_shared<text>(rsc/"koro.txt");
+    text_sptr koro_sptr_2 = rmanager.get_shared<text>(rsc/"koro.txt");
     ASSERT_NE(koro_sptr, nullptr);
     ASSERT_EQ(koro_sptr, koro_sptr_2);
     ASSERT_EQ(koro_sptr->contents, koro_contents());
@@ -114,9 +114,9 @@ TEST(resource_manager_tests, test_get_ref)
 
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
-    text& koro_ref = rmanager.get_ref<text>(rsc/"koro.txt");
-    text& koro_ref2 = rmanager.get_ref<text>(rsc/"koro.txt");
-    rmanager.get_ref<text>(rsc/"tiki.txt");
+    text& koro_ref = rmanager.get<text>(rsc/"koro.txt");
+    text& koro_ref2 = rmanager.get<text>(rsc/"koro.txt");
+    rmanager.get<text>(rsc/"tiki.txt");
     ASSERT_EQ(rmanager.number_of_resources<text>(), 2);
     ASSERT_EQ(&koro_ref, &koro_ref2);
 }
@@ -128,11 +128,11 @@ TEST(resource_manager_tests, test_insert)
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
     bool ins_res = rmanager.insert("default_tale", tale_sptr);
     ASSERT_TRUE(ins_res);
-    ASSERT_EQ(tale_sptr, rmanager.get<text>("default_tale"));
+    ASSERT_EQ(tale_sptr, rmanager.get_shared<text>("default_tale"));
     text_sptr tale_2_sptr = std::make_shared<text>("Once upon a time 2");
     ins_res = rmanager.insert("default_tale", tale_2_sptr);
     ASSERT_FALSE(ins_res);
-    ASSERT_EQ(tale_sptr, rmanager.get<text>("default_tale"));
+    ASSERT_EQ(tale_sptr, rmanager.get_shared<text>("default_tale"));
 }
 
 TEST(resource_manager_tests, test_set)
@@ -142,12 +142,12 @@ TEST(resource_manager_tests, test_set)
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
     text* tale_ptr = tale_sptr.get();
     rmanager.set<text>("default_tale", std::move(tale_sptr));
-    ASSERT_EQ(tale_ptr, rmanager.get<text>("default_tale").get());
+    ASSERT_EQ(tale_ptr, rmanager.get_shared<text>("default_tale").get());
     ASSERT_EQ(tale_ptr->contents, "Once upon a time");
     text_sptr tale_2_sptr = std::make_shared<text>("Once upon a time 2");
     text* tale_2_ptr = tale_2_sptr.get();
     rmanager.set<text>("default_tale", std::move(tale_2_sptr));
-    ASSERT_EQ(tale_2_ptr, rmanager.get<text>("default_tale").get());
+    ASSERT_EQ(tale_2_ptr, rmanager.get_shared<text>("default_tale").get());
     ASSERT_EQ(tale_2_ptr->contents, "Once upon a time 2");
 }
 
@@ -158,11 +158,11 @@ TEST(resource_manager_tests, test_set_2)
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
     text* tale_ptr = tale_sptr.get();
     rmanager.set<text>("default_tale", std::move(tale_sptr));
-    ASSERT_EQ(tale_ptr, rmanager.get<text>("default_tale").get());
+    ASSERT_EQ(tale_ptr, rmanager.get_shared<text>("default_tale").get());
     ASSERT_EQ(tale_ptr->contents, "Once upon a time");
     text tale_2{"Once upon a time 2"};
     rmanager.set<text>("default_tale", std::move(tale_2));
-    ASSERT_EQ(tale_ptr, rmanager.get<text>("default_tale").get());
+    ASSERT_EQ(tale_ptr, rmanager.get_shared<text>("default_tale").get());
     ASSERT_EQ(tale_ptr->contents, "Once upon a time 2");
 }
 
@@ -202,8 +202,8 @@ TEST(resource_manager_tests, test_get_vlfs)
 
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
-    text_sptr koro_sptr = rmanager.get<text>("RSC:/koro.txt");
-    text_sptr koro_sptr_2 = rmanager.get<text>("RSC:/koro.txt");
+    text_sptr koro_sptr = rmanager.get_shared<text>("RSC:/koro.txt");
+    text_sptr koro_sptr_2 = rmanager.get_shared<text>("RSC:/koro.txt");
     ASSERT_NE(koro_sptr, nullptr);
     ASSERT_EQ(koro_sptr, koro_sptr_2);
     ASSERT_EQ(koro_sptr->contents, koro_contents());
@@ -217,9 +217,9 @@ TEST(resource_manager_tests, test_get_ref_vlfs)
 
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
-    text& koro_ref = rmanager.get_ref<text>("RSC:/koro.txt");
-    text& koro_ref2 = rmanager.get_ref<text>("RSC:/koro.txt");
-    rmanager.get_ref<text>("RSC:/tiki.txt");
+    text& koro_ref = rmanager.get<text>("RSC:/koro.txt");
+    text& koro_ref2 = rmanager.get<text>("RSC:/koro.txt");
+    rmanager.get<text>("RSC:/tiki.txt");
     ASSERT_EQ(rmanager.number_of_resources<text>(), 2);
     ASSERT_EQ(&koro_ref, &koro_ref2);
 }
@@ -231,11 +231,11 @@ TEST(resource_manager_tests, test_insert_vlfs)
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
     bool ins_res = rmanager.insert("default_tale", tale_sptr);
     ASSERT_TRUE(ins_res);
-    ASSERT_EQ(tale_sptr, rmanager.get<text>("default_tale"));
+    ASSERT_EQ(tale_sptr, rmanager.get_shared<text>("default_tale"));
     text_sptr tale_2_sptr = std::make_shared<text>("Once upon a time 2");
     ins_res = rmanager.insert("default_tale", tale_2_sptr);
     ASSERT_FALSE(ins_res);
-    ASSERT_EQ(tale_sptr, rmanager.get<text>("default_tale"));
+    ASSERT_EQ(tale_sptr, rmanager.get_shared<text>("default_tale"));
 }
 
 TEST(resource_manager_tests, test_set_vlfs)
@@ -245,12 +245,12 @@ TEST(resource_manager_tests, test_set_vlfs)
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
     text* tale_ptr = tale_sptr.get();
     rmanager.set<text>("default_tale", std::move(tale_sptr));
-    ASSERT_EQ(tale_ptr, rmanager.get<text>("default_tale").get());
+    ASSERT_EQ(tale_ptr, rmanager.get_shared<text>("default_tale").get());
     ASSERT_EQ(tale_ptr->contents, "Once upon a time");
     text_sptr tale_2_sptr = std::make_shared<text>("Once upon a time 2");
     text* tale_2_ptr = tale_2_sptr.get();
     rmanager.set<text>("default_tale", std::move(tale_2_sptr));
-    ASSERT_EQ(tale_2_ptr, rmanager.get<text>("default_tale").get());
+    ASSERT_EQ(tale_2_ptr, rmanager.get_shared<text>("default_tale").get());
     ASSERT_EQ(tale_2_ptr->contents, "Once upon a time 2");
 }
 
@@ -261,11 +261,11 @@ TEST(resource_manager_tests, test_set_2_vlfs)
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
     text* tale_ptr = tale_sptr.get();
     rmanager.set<text>("default_tale", std::move(tale_sptr));
-    ASSERT_EQ(tale_ptr, rmanager.get<text>("default_tale").get());
+    ASSERT_EQ(tale_ptr, rmanager.get_shared<text>("default_tale").get());
     ASSERT_EQ(tale_ptr->contents, "Once upon a time");
     text tale_2{"Once upon a time 2"};
     rmanager.set<text>("default_tale", std::move(tale_2));
-    ASSERT_EQ(tale_ptr, rmanager.get<text>("default_tale").get());
+    ASSERT_EQ(tale_ptr, rmanager.get_shared<text>("default_tale").get());
     ASSERT_EQ(tale_ptr->contents, "Once upon a time 2");
 }
 

@@ -46,7 +46,7 @@ public:
     inline void        clear() { resources_.clear(); }
     inline void        reserve(std::size_t capacity) { resources_.reserve(capacity); }
 
-    resource_sptr get(const std::filesystem::path& rsc_path);
+    resource_sptr get_shared(const std::filesystem::path& rsc_path);
     bool          insert(const std::filesystem::path& rsc_path, resource_sptr resource);
     void          set(const std::filesystem::path& rsc_path, resource_sptr &&resource);
     void          set(const std::filesystem::path& rsc_path, resource_type&& resource);
@@ -54,7 +54,7 @@ public:
     inline void   remove(const std::filesystem::path& rsc_path) { resources_.erase(rsc_path); }
 
     template <class resource_manager_type>
-    resource_sptr get(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
+    resource_sptr get_shared(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
 
     template <class resource_manager_type>
     requires traits::is_loadable_resource_v<resource_type, resource_manager_type>
@@ -73,7 +73,7 @@ private:
 
 template <class resource_type>
 default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::get(const std::filesystem::path &rsc_path)
+default_resource_store<resource_type>::get_shared(const std::filesystem::path &rsc_path)
 {
     std::lock_guard lock(mutex_);
     auto iter = resources_.find(rsc_path);
@@ -85,7 +85,7 @@ default_resource_store<resource_type>::get(const std::filesystem::path &rsc_path
 template <class resource_type>
 template <class resource_manager_type>
 default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::get(const std::filesystem::path &rsc_path, resource_manager_type& rsc_manager)
+default_resource_store<resource_type>::get_shared(const std::filesystem::path &rsc_path, resource_manager_type& rsc_manager)
 {
     std::lock_guard lock(mutex_);
     auto iter = resources_.find(rsc_path);

@@ -95,8 +95,8 @@ TEST(resource_store_tests, test_get)
     std::filesystem::path rsc = rscdir();
 
     rsce::resource_store<text> text_store;
-    text_sptr koro_sptr = text_store.get(rsc/"koro.txt");
-    text_sptr koro_sptr_2 = text_store.get(rsc/"koro.txt");
+    text_sptr koro_sptr = text_store.get_shared(rsc/"koro.txt");
+    text_sptr koro_sptr_2 = text_store.get_shared(rsc/"koro.txt");
     ASSERT_NE(koro_sptr, nullptr);
     ASSERT_EQ(koro_sptr, koro_sptr_2);
     ASSERT_EQ(koro_sptr->contents, koro_contents());
@@ -109,8 +109,8 @@ TEST(resource_store_tests, test_clear)
     std::filesystem::path rsc = rscdir();
 
     rsce::resource_store<text> text_store;
-    text_store.get(rsc/"koro.txt");
-    text_store.get(rsc/"tiki.txt");
+    text_store.get_shared(rsc/"koro.txt");
+    text_store.get_shared(rsc/"tiki.txt");
     ASSERT_EQ(text_store.size(), 2);
     text_store.clear();
     ASSERT_EQ(text_store.size(), 0);
@@ -122,11 +122,11 @@ TEST(resource_store_tests, test_insert)
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
     bool ins_res = text_store.insert("default_tale", tale_sptr);
     ASSERT_TRUE(ins_res);
-    ASSERT_EQ(tale_sptr, text_store.get("default_tale"));
+    ASSERT_EQ(tale_sptr, text_store.get_shared("default_tale"));
     text_sptr tale_2_sptr = std::make_shared<text>("Once upon a time 2");
     ins_res = text_store.insert("default_tale", tale_2_sptr);
     ASSERT_FALSE(ins_res);
-    ASSERT_EQ(tale_sptr, text_store.get("default_tale"));
+    ASSERT_EQ(tale_sptr, text_store.get_shared("default_tale"));
 }
 
 TEST(resource_store_tests, test_set)
@@ -135,12 +135,12 @@ TEST(resource_store_tests, test_set)
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
     text* tale_ptr = tale_sptr.get();
     text_store.set("default_tale", std::move(tale_sptr));
-    ASSERT_EQ(tale_ptr, text_store.get("default_tale").get());
+    ASSERT_EQ(tale_ptr, text_store.get_shared("default_tale").get());
     ASSERT_EQ(tale_ptr->contents, "Once upon a time");
     text_sptr tale_2_sptr = std::make_shared<text>("Once upon a time 2");
     text* tale_2_ptr = tale_2_sptr.get();
     text_store.set("default_tale", std::move(tale_2_sptr));
-    ASSERT_EQ(tale_2_ptr, text_store.get("default_tale").get());
+    ASSERT_EQ(tale_2_ptr, text_store.get_shared("default_tale").get());
     ASSERT_EQ(tale_2_ptr->contents, "Once upon a time 2");
 }
 
@@ -150,11 +150,11 @@ TEST(resource_store_tests, test_set_2)
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
     text* tale_ptr = tale_sptr.get();
     rmanager.set("default_tale", std::move(tale_sptr));
-    ASSERT_EQ(tale_ptr, rmanager.get("default_tale").get());
+    ASSERT_EQ(tale_ptr, rmanager.get_shared("default_tale").get());
     ASSERT_EQ(tale_ptr->contents, "Once upon a time");
     text tale_2{"Once upon a time 2"};
     rmanager.set("default_tale", std::move(tale_2));
-    ASSERT_EQ(tale_ptr, rmanager.get("default_tale").get());
+    ASSERT_EQ(tale_ptr, rmanager.get_shared("default_tale").get());
     ASSERT_EQ(tale_ptr->contents, "Once upon a time 2");
 }
 
