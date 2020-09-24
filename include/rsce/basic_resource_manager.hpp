@@ -10,6 +10,10 @@ namespace rsce
 class basic_resource_manager
 {
 public:
+    basic_resource_manager() = default;
+    basic_resource_manager(const basic_resource_manager&) = delete;
+    basic_resource_manager& operator=(const basic_resource_manager&) = delete;
+
     template <class resource>
     inline std::shared_ptr<resource> get(const std::filesystem::path& rsc_path)
     {
