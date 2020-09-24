@@ -35,6 +35,7 @@ set(headers
     include/rsce/load_resource_from_file.hpp
     include/rsce/resource_store.hpp
     include/rsce/basic_resource_manager.hpp
+    include/rsce/resource_manager.hpp
 )
 
 # Sources:
@@ -63,8 +64,10 @@ install_cpp_library_targets(${PROJECT_NAME}
                             )
 
 # Link targets:
-# find_package(TBB 2018 REQUIRED CONFIG)
-# cpp_library_targets_link_libraries(${PROJECT_NAME} PUBLIC TBB::tbb)
+if(NOT TARGET arba::vlfs)
+     find_package(vlfs 0.1.0 REQUIRED CONFIG)
+endif()
+ cpp_library_targets_link_libraries(${PROJECT_NAME} PUBLIC arba::vlfs)
 
 # Install package
 install_package(${PROJECT_NAME}
