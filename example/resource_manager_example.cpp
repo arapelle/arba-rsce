@@ -43,8 +43,10 @@ int main()
     vlfs.set_virtual_root("RSC", "RSCE:/rsc");
 
     rsce::resource_manager rmanager(vlfs);
-    text& tale = rmanager.get<text>("RSC:/tale.txt");
+    const text& tale = rmanager.get<text>("RSC:/tale.txt");
+    const text& tale_2 = rmanager.get<text>(std::filesystem::temp_directory_path()/"rsce/rsc/tale.txt");
     std::cout << tale.contents << std::endl;
+    std::cout << tale_2.contents << std::endl;
 
     return EXIT_SUCCESS;
 }

@@ -43,7 +43,7 @@ int main()
     vlfs.set_virtual_root("RSC", "RSCE:/rsc");
 
     rsce::resource_manager rmanager(vlfs);
-    text& tale = rmanager.get<text>("RSC:/tale.txt");
+    const text& tale = rmanager.get<text>("RSC:/tale.txt");
     std::cout << tale.contents << std::endl;
 
     return EXIT_SUCCESS;
