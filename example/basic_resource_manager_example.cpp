@@ -1,5 +1,5 @@
 #include <iostream>
-#include <rsce/resource_store.hpp>
+#include <rsce/basic_resource_manager.hpp>
 #include <fstream>
 
 class text
@@ -33,5 +33,14 @@ template<> struct hash<text>
 
 int main()
 {
+    std::ofstream stream(std::filesystem::temp_directory_path()/"rsce/rsc/tale.txt");
+    stream << "Once upon a time, a mighty spirit...";
+    stream.close();
+
+    rsce::basic_resource_manager rmanager;
+    text& tale = rmanager.get_ref<text>(std::filesystem::temp_directory_path()/"rsce/rsc/tale.txt");
+
+    std::cout << tale.contents << std::endl;
+
     return EXIT_SUCCESS;
 }
