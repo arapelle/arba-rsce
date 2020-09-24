@@ -32,12 +32,13 @@ library_build_options(${PROJECT_NAME} STATIC SHARED EXAMPLE TEST)
 
 # Headers:
 set(headers
-include/rsce/rsce.hpp
+    include/rsce/load_resource_from_file.hpp
+    include/rsce/resource_store.hpp
 )
 
 # Sources:
 set(sources
-src/rsce.cpp
+    src/resource_store.cpp
 )
 
 # Add C++ library
