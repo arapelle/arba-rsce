@@ -35,6 +35,8 @@ template<> struct hash<text>
 };
 }
 
+static_assert(rsce::traits::is_loadable_resource_v<text>);
+
 using text_sptr = rsce::resource_store<text>::resource_sptr;
 
 namespace rsce

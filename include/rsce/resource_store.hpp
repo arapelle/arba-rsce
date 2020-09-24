@@ -12,6 +12,8 @@
 
 namespace rsce
 {
+class basic_resource_manager;
+
 class resource_store_base
 {
 public:
@@ -51,6 +53,17 @@ public:
     resource_sptr load(const std::filesystem::path& rsc_path);
     inline void   remove(const std::filesystem::path& rsc_path) { resources_.erase(rsc_path); }
 
+    template <class resource_manager_type>
+    resource_sptr get(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
+
+    template <class resource_manager_type>
+    requires traits::is_loadable_resource_v<resource_type, resource_manager_type>
+    resource_sptr load(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
+
+    template <class resource_manager_type>
+    requires (!traits::is_loadable_resource_v<resource_type, resource_manager_type>)
+    resource_sptr load(const std::filesystem::path& rsc_path, resource_manager_type&) { return load(rsc_path); }
+
 private:
     resource_dico resources_;
     std::recursive_mutex mutex_;
@@ -67,6 +80,18 @@ default_resource_store<resource_type>::get(const std::filesystem::path &rsc_path
     if (iter != resources_.end())
         return iter->second;
     return load(rsc_path);
+}
+
+template <class resource_type>
+template <class resource_manager_type>
+default_resource_store<resource_type>::resource_sptr
+default_resource_store<resource_type>::get(const std::filesystem::path &rsc_path, resource_manager_type& rsc_manager)
+{
+    std::lock_guard lock(mutex_);
+    auto iter = resources_.find(rsc_path);
+    if (iter != resources_.end())
+        return iter->second;
+    return load(rsc_path, rsc_manager);
 }
 
 template <class resource_type>
@@ -96,13 +121,46 @@ void default_resource_store<resource_type>::set(const std::filesystem::path &rsc
 }
 
 template <class resource_type>
+requires traits::is_loadable_resource_v<resource_type>
 default_resource_store<resource_type>::resource_sptr
 default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path)
 {
     if (std::filesystem::exists(rsc_path))
     {
-//        std::cout << "loading the resource file " << rsc_path << ".";
+        //        std::cout << "loading the resource file " << rsc_path << ".";
         if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path); resource)
+        {
+            std::lock_guard lock(mutex_);
+            resources_.emplace(rsc_path, resource);
+            return resource;
+        }
+        else
+        {
+            std::ostringstream stream;
+            stream << "The resource file " << rsc_path << " wasn't loaded correctly (nullptr returned).";
+            std::runtime_error(stream.str());
+        }
+    }
+    else
+    {
+        std::ostringstream stream;
+        stream << "The resource file " << rsc_path << " does not exist.";
+        std::runtime_error(stream.str());
+    }
+
+    return nullptr;
+}
+
+template <class resource_type>
+template <class resource_manager_type>
+requires traits::is_loadable_resource_v<resource_type, resource_manager_type>
+default_resource_store<resource_type>::resource_sptr
+default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path, resource_manager_type& rsc_manager)
+{
+    if (std::filesystem::exists(rsc_path))
+    {
+//        std::cout << "loading the resource file " << rsc_path << ".";
+        if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path, rsc_manager); resource)
         {
             std::lock_guard lock(mutex_);
             resources_.emplace(rsc_path, resource);

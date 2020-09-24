@@ -13,7 +13,7 @@ public:
 
     inline bool operator<=>(const text&) const = default;
 
-    bool load_from_file(const std::filesystem::path& fpath)
+    bool load_from_file(const std::filesystem::path& fpath, rsce::basic_resource_manager& rmanager)
     {
         std::ifstream stream(fpath);
         stream.seekg(0, std::ios::end);
@@ -77,12 +77,12 @@ void create_resource_files()
 
 // Unit tests:
 
-TEST(basic_resource_manager_tests, test_constructor)
+TEST(basic_resource_manager_tests_2, test_constructor)
 {
     rsce::basic_resource_manager rmanager;
 }
 
-TEST(basic_resource_manager_tests, test_get)
+TEST(basic_resource_manager_tests_2, test_get)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -96,7 +96,7 @@ TEST(basic_resource_manager_tests, test_get)
     ASSERT_EQ(rmanager.number_of_resources<text>(), 1);
 }
 
-TEST(basic_resource_manager_tests, test_get_ref)
+TEST(basic_resource_manager_tests_2, test_get_ref)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -108,7 +108,7 @@ TEST(basic_resource_manager_tests, test_get_ref)
     ASSERT_EQ(&koro_ref, &koro_ref2);
 }
 
-TEST(basic_resource_manager_tests, test_insert)
+TEST(basic_resource_manager_tests_2, test_insert)
 {
     rsce::basic_resource_manager rmanager;
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
@@ -121,7 +121,7 @@ TEST(basic_resource_manager_tests, test_insert)
     ASSERT_EQ(tale_sptr, rmanager.get<text>("default_tale"));
 }
 
-TEST(basic_resource_manager_tests, test_set)
+TEST(basic_resource_manager_tests_2, test_set)
 {
     rsce::basic_resource_manager rmanager;
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
@@ -136,7 +136,7 @@ TEST(basic_resource_manager_tests, test_set)
     ASSERT_EQ(tale_2_ptr->contents, "Once upon a time 2");
 }
 
-TEST(basic_resource_manager_tests, test_set_2)
+TEST(basic_resource_manager_tests_2, test_set_2)
 {
     rsce::basic_resource_manager rmanager;
     text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
@@ -150,7 +150,7 @@ TEST(basic_resource_manager_tests, test_set_2)
     ASSERT_EQ(tale_ptr->contents, "Once upon a time 2");
 }
 
-TEST(basic_resource_manager_tests, test_load)
+TEST(basic_resource_manager_tests_2, test_load)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -164,7 +164,7 @@ TEST(basic_resource_manager_tests, test_load)
     ASSERT_EQ(koro_sptr->contents, koro_2_sptr->contents);
 }
 
-TEST(basic_resource_manager_tests, test_remove)
+TEST(basic_resource_manager_tests_2, test_remove)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -178,14 +178,14 @@ TEST(basic_resource_manager_tests, test_remove)
     ASSERT_EQ(rmanager.number_of_resources<text>(), 0);
 }
 
-TEST(basic_resource_manager_tests, test_store)
+TEST(basic_resource_manager_tests_2, test_store)
 {
     std::filesystem::path rsc = rscdir();
 
     rsce::basic_resource_manager rmanager;
     text_sptr tiki_sptr = rmanager.load<text>(rsc/"tiki.txt");
     rsce::resource_store<text>& text_store = rmanager.store<text>();
-    text_sptr tiki_sptr_2 = text_store.get(rsc/"tiki.txt");
+    text_sptr tiki_sptr_2 = text_store.get(rsc/"tiki.txt", rmanager);
     ASSERT_EQ(text_store.size(), 1);
     ASSERT_EQ(tiki_sptr, tiki_sptr_2);
 }
@@ -198,7 +198,7 @@ class green_text : public text
 {
 };
 
-TEST(basic_resource_manager_tests, test_creation_order)
+TEST(basic_resource_manager_tests_2, test_creation_order)
 {
     std::filesystem::path rsc = rscdir();
 

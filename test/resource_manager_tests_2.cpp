@@ -13,7 +13,7 @@ public:
 
     inline bool operator<=>(const text&) const = default;
 
-    bool load_from_file(const std::filesystem::path& fpath)
+    bool load_from_file(const std::filesystem::path& fpath, rsce::resource_manager& rmanager)
     {
         std::ifstream stream(fpath);
         stream.seekg(0, std::ios::end);
@@ -86,14 +86,14 @@ vlfs::virtual_filesystem create_vlfs()
 
 // Unit tests:
 
-TEST(resource_manager_tests, test_constructor)
+TEST(resource_manager_tests_2, test_constructor)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
     ASSERT_EQ(rmanager.virtual_filesystem(), &vlfs);
 }
 
-TEST(resource_manager_tests, test_get)
+TEST(resource_manager_tests_2, test_get)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -108,7 +108,7 @@ TEST(resource_manager_tests, test_get)
     ASSERT_EQ(rmanager.number_of_resources<text>(), 1);
 }
 
-TEST(resource_manager_tests, test_get_ref)
+TEST(resource_manager_tests_2, test_get_ref)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -121,7 +121,7 @@ TEST(resource_manager_tests, test_get_ref)
     ASSERT_EQ(&koro_ref, &koro_ref2);
 }
 
-TEST(resource_manager_tests, test_insert)
+TEST(resource_manager_tests_2, test_insert)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
@@ -135,7 +135,7 @@ TEST(resource_manager_tests, test_insert)
     ASSERT_EQ(tale_sptr, rmanager.get<text>("default_tale"));
 }
 
-TEST(resource_manager_tests, test_set)
+TEST(resource_manager_tests_2, test_set)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
@@ -151,7 +151,7 @@ TEST(resource_manager_tests, test_set)
     ASSERT_EQ(tale_2_ptr->contents, "Once upon a time 2");
 }
 
-TEST(resource_manager_tests, test_set_2)
+TEST(resource_manager_tests_2, test_set_2)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
@@ -166,7 +166,7 @@ TEST(resource_manager_tests, test_set_2)
     ASSERT_EQ(tale_ptr->contents, "Once upon a time 2");
 }
 
-TEST(resource_manager_tests, test_load)
+TEST(resource_manager_tests_2, test_load)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -181,7 +181,7 @@ TEST(resource_manager_tests, test_load)
     ASSERT_EQ(koro_sptr->contents, koro_2_sptr->contents);
 }
 
-TEST(resource_manager_tests, test_remove)
+TEST(resource_manager_tests_2, test_remove)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -196,7 +196,7 @@ TEST(resource_manager_tests, test_remove)
     ASSERT_EQ(rmanager.number_of_resources<text>(), 0);
 }
 
-TEST(resource_manager_tests, test_get_vlfs)
+TEST(resource_manager_tests_2, test_get_vlfs)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -211,7 +211,7 @@ TEST(resource_manager_tests, test_get_vlfs)
     ASSERT_EQ(rmanager.number_of_resources<text>(), 1);
 }
 
-TEST(resource_manager_tests, test_get_ref_vlfs)
+TEST(resource_manager_tests_2, test_get_ref_vlfs)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -224,7 +224,7 @@ TEST(resource_manager_tests, test_get_ref_vlfs)
     ASSERT_EQ(&koro_ref, &koro_ref2);
 }
 
-TEST(resource_manager_tests, test_insert_vlfs)
+TEST(resource_manager_tests_2, test_insert_vlfs)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
@@ -238,7 +238,7 @@ TEST(resource_manager_tests, test_insert_vlfs)
     ASSERT_EQ(tale_sptr, rmanager.get<text>("default_tale"));
 }
 
-TEST(resource_manager_tests, test_set_vlfs)
+TEST(resource_manager_tests_2, test_set_vlfs)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
@@ -254,7 +254,7 @@ TEST(resource_manager_tests, test_set_vlfs)
     ASSERT_EQ(tale_2_ptr->contents, "Once upon a time 2");
 }
 
-TEST(resource_manager_tests, test_set_2_vlfs)
+TEST(resource_manager_tests_2, test_set_2_vlfs)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
@@ -269,7 +269,7 @@ TEST(resource_manager_tests, test_set_2_vlfs)
     ASSERT_EQ(tale_ptr->contents, "Once upon a time 2");
 }
 
-TEST(resource_manager_tests, test_load_vlfs)
+TEST(resource_manager_tests_2, test_load_vlfs)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -284,7 +284,7 @@ TEST(resource_manager_tests, test_load_vlfs)
     ASSERT_EQ(koro_sptr->contents, koro_2_sptr->contents);
 }
 
-TEST(resource_manager_tests, test_remove_vlfs)
+TEST(resource_manager_tests_2, test_remove_vlfs)
 {
     std::filesystem::path rsc = rscdir();
 

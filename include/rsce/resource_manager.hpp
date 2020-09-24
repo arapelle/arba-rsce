@@ -16,13 +16,15 @@ public:
     template <class resource>
     inline std::shared_ptr<resource> get(const std::filesystem::path& rsc_path)
     {
-        return this->basic_resource_manager::get<resource>(vlfs_->real_path(rsc_path));
+        return this->get_or_create_resource_store_<resource>().get(vlfs_->real_path(rsc_path), *this);
     }
 
     template <class resource>
     inline resource& get_ref(const std::filesystem::path& rsc_path)
     {
-        return this->basic_resource_manager::get_ref<resource>(vlfs_->real_path(rsc_path));
+        std::shared_ptr<resource> rsc_sptr = get<resource>(rsc_path);
+        assert(rsc_sptr);
+        return *rsc_sptr;
     }
 
     template <class resource>
@@ -46,7 +48,7 @@ public:
     template <class resource>
     inline std::shared_ptr<resource> load(const std::filesystem::path& rsc_path)
     {
-        return this->basic_resource_manager::load<resource>(vlfs_->real_path(rsc_path));
+        return this->get_or_create_resource_store_<resource>().load(vlfs_->real_path(rsc_path), *this);
     }
 
     template <class resource>

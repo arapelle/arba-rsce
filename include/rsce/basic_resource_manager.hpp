@@ -17,7 +17,7 @@ public:
     template <class resource>
     inline std::shared_ptr<resource> get(const std::filesystem::path& rsc_path)
     {
-        return get_or_create_resource_store_<resource>().get(rsc_path);
+        return get_or_create_resource_store_<resource>().get(rsc_path, *this);
     }
 
     template <class resource>
@@ -49,7 +49,7 @@ public:
     template <class resource>
     inline std::shared_ptr<resource> load(const std::filesystem::path& rsc_path)
     {
-        return get_or_create_resource_store_<resource>().load(rsc_path);
+        return get_or_create_resource_store_<resource>().load(rsc_path, *this);
     }
 
     template <class resource>
@@ -70,7 +70,7 @@ public:
         return get_or_create_resource_store_<resource>();
     }
 
-private:
+protected:
     template <class resource>
     inline resource_store<resource>& get_store_()
     {
