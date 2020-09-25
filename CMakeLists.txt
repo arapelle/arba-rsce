@@ -15,9 +15,9 @@ set_build_type_if_undefined()
 # C++ PROJECT
 
 project(rsce
-        VERSION 0.1.0
-#        DESCRIPTION ""
-#        HOMEPAGE_URL ""
+        VERSION 0.1.1
+        DESCRIPTION "A C++ library providing tools for managing resources."
+        HOMEPAGE_URL "https://github.com/arapelle/rsce"
         LANGUAGES CXX)
 
 message(STATUS "BUILD   : ${CMAKE_BUILD_TYPE}")
