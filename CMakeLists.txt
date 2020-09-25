@@ -15,7 +15,7 @@ set_build_type_if_undefined()
 # C++ PROJECT
 
 project(rsce
-        VERSION 0.1.0
+        VERSION 0.1.1
 #        DESCRIPTION ""
 #        HOMEPAGE_URL ""
         LANGUAGES CXX)
