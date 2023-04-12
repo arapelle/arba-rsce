@@ -33,6 +33,7 @@ template<> struct hash<text>
 
 int main()
 {
+    std::filesystem::create_directories(std::filesystem::temp_directory_path()/"rsce/rsc");
     std::ofstream stream(std::filesystem::temp_directory_path()/"rsce/rsc/tale.txt");
     stream << "Once upon a time...";
     stream.close();
