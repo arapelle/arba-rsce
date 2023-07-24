@@ -5,6 +5,12 @@ add_cpp_library_basic_tests(GTest::gtest_main
     STATIC ${PROJECT_NAME}-static
     SOURCES
         project_version_tests.cpp
+)
+
+add_cpp_library_basic_tests(GTest::gtest
+    SHARED ${PROJECT_NAME}
+    STATIC ${PROJECT_NAME}-static
+    SOURCES
         resource_store_tests.cpp
         basic_resource_manager_tests.cpp
         basic_resource_manager_tests_2.cpp
