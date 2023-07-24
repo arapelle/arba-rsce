@@ -34,10 +34,10 @@ generate_version_macro_header(generated_version_header
 
 ## Headers:
 set(headers
-    include/rsce/load_resource_from_file.hpp
-    include/rsce/resource_store.hpp
-    include/rsce/basic_resource_manager.hpp
-    include/rsce/resource_manager.hpp
+    include/arba/rsce/load_resource_from_file.hpp
+    include/arba/rsce/resource_store.hpp
+    include/arba/rsce/basic_resource_manager.hpp
+    include/arba/rsce/resource_manager.hpp
 )
 
 ## Sources:

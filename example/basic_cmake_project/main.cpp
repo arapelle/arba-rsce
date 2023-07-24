@@ -1,6 +1,6 @@
 #include <iostream>
 #include <arba/rsce/version.hpp>
-#include <rsce/resource_manager.hpp>
+#include <arba/rsce/resource_manager.hpp>
 #include <fstream>
 
 class text

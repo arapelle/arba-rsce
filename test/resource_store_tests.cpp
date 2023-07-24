@@ -1,4 +1,4 @@
-#include <rsce/resource_store.hpp>
+#include <arba/rsce/resource_store.hpp>
 #include <gtest/gtest.h>
 #include <string>
 #include <cstdlib>

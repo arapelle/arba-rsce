@@ -1,5 +1,5 @@
 #include <iostream>
-#include <rsce/basic_resource_manager.hpp>
+#include <arba/rsce/basic_resource_manager.hpp>
 #include <fstream>
 
 class text
