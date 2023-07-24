@@ -3,8 +3,11 @@
 #include "basic_resource_manager.hpp"
 #include <arba/vlfs/vlfs.hpp>
 
+inline namespace arba
+{
 namespace rsce
 {
+
 class resource_manager : public basic_resource_manager
 {
 public:
@@ -60,4 +63,6 @@ public:
 private:
     vlfs::virtual_filesystem* vlfs_ = nullptr;
 };
+
+}
 }

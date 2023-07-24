@@ -10,8 +10,11 @@
 #include <mutex>
 #include <concepts>
 
+inline namespace arba
+{
 namespace rsce
 {
+
 class basic_resource_manager;
 
 class resource_store_base
@@ -188,4 +191,6 @@ class resource_store : public default_resource_store<resource_type>
 public:
     using default_resource_store<resource_type>::default_resource_store;
 };
+
+}
 }

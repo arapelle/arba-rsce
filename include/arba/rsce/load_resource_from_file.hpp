@@ -3,8 +3,11 @@
 #include <filesystem>
 #include <memory>
 
+inline namespace arba
+{
 namespace rsce
 {
+
 template <class resource_type>
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path) = delete;
 
@@ -66,5 +69,7 @@ inline constexpr bool is_loadable_resource_v<resource_type, resource_manager_typ
 template <class resource_type>
 requires concepts::loadable_resource<resource_type>
 inline constexpr bool is_loadable_resource_v<resource_type, void> = true;
+}
+
 }
 }

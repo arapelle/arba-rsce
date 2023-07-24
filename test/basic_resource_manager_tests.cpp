@@ -79,7 +79,7 @@ void create_resource_files()
 
 TEST(basic_resource_manager_tests, test_constructor)
 {
-    rsce::basic_resource_manager rmanager;
+    arba::rsce::basic_resource_manager rmanager;
 }
 
 TEST(basic_resource_manager_tests, test_get)

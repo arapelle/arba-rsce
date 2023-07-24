@@ -5,8 +5,11 @@
 #include <atomic>
 #include <cassert>
 
+inline namespace arba
+{
 namespace rsce
 {
+
 class basic_resource_manager
 {
 public:
@@ -123,4 +126,6 @@ private:
     std::vector<resource_store_interface_uptr> resource_stores_;
     std::recursive_mutex mutex_;
 };
+
+}
 }
