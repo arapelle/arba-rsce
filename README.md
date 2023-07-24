@@ -19,8 +19,7 @@ Binaries:
 
 Libraries:
 
-- [strn](https://github.com/arapelle/strn) 0.1.4
-- [vlfs](https://github.com/arapelle/vlfs) 0.1.0
+- [arba-vlfs](https://github.com/arapelle/arba-vlfs) 0.2.0
 - [Google Test](https://github.com/google/googletest) 1.10 or later (only for testing)
 
 ## Clone

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "basic_resource_manager.hpp"
-#include <vlfs/vlfs.hpp>
+#include <arba/vlfs/vlfs.hpp>
 
 namespace rsce
 {

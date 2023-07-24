@@ -121,7 +121,6 @@ void default_resource_store<resource_type>::set(const std::filesystem::path &rsc
 }
 
 template <class resource_type>
-requires traits::is_loadable_resource_v<resource_type>
 default_resource_store<resource_type>::resource_sptr
 default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path)
 {

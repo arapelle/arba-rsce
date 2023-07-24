@@ -4,7 +4,7 @@ project(basic_cmake_project)
 
 add_executable(${PROJECT_NAME} main.cpp)
 # Find package rsce:
-find_package(rsce 0.2 CONFIG REQUIRED)
+find_package(rsce 0.2.0 CONFIG REQUIRED)
 # Use rsce release shared target:
 target_link_libraries(${PROJECT_NAME} PRIVATE rsce)
 # Use rsce release static target:

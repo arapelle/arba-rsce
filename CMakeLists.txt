@@ -15,7 +15,7 @@ set_build_type_if_undefined()
 # C++ PROJECT
 
 project(rsce
-        VERSION 0.2
+        VERSION 0.2.0
         DESCRIPTION "A C++ library providing tools for managing resources."
         HOMEPAGE_URL "https://github.com/arapelle/rsce"
         LANGUAGES CXX)
@@ -64,10 +64,10 @@ install_cpp_library_targets(${PROJECT_NAME}
                             )
 
 # Link targets:
-if(NOT TARGET arba::vlfs)
-     find_package(vlfs 0.1.0 REQUIRED CONFIG)
+if(NOT TARGET arba-vlfs)
+     find_package(arba-vlfs 0.2.0 REQUIRED CONFIG)
 endif()
- cpp_library_targets_link_libraries(${PROJECT_NAME} PUBLIC arba::vlfs)
+ cpp_library_targets_link_libraries(${PROJECT_NAME} PUBLIC arba-vlfs)
 
 # Install package
 install_package(${PROJECT_NAME}
