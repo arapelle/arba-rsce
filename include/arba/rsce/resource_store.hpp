@@ -10,8 +10,11 @@
 #include <mutex>
 #include <concepts>
 
+inline namespace arba
+{
 namespace rsce
 {
+
 class basic_resource_manager;
 
 class resource_store_base
@@ -121,7 +124,6 @@ void default_resource_store<resource_type>::set(const std::filesystem::path &rsc
 }
 
 template <class resource_type>
-requires traits::is_loadable_resource_v<resource_type>
 default_resource_store<resource_type>::resource_sptr
 default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path)
 {
@@ -189,4 +191,6 @@ class resource_store : public default_resource_store<resource_type>
 public:
     using default_resource_store<resource_type>::default_resource_store;
 };
+
+}
 }

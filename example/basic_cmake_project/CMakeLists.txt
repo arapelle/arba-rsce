@@ -1,12 +1,12 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.26)
 
 project(basic_cmake_project)
 
 add_executable(${PROJECT_NAME} main.cpp)
-# Find package rsce:
-find_package(rsce 0.1.1 CONFIG REQUIRED)
-# Use rsce release shared target:
-target_link_libraries(${PROJECT_NAME} PRIVATE rsce)
-# Use rsce release static target:
-#target_link_libraries(${PROJECT_NAME} PRIVATE rsce-static)
-
+add_executable(${PROJECT_NAME}-static main.cpp)
+# Find package arba-rsce:
+find_package(arba-rsce 0.2.0 CONFIG REQUIRED)
+# Use arba-rsce release shared target:
+target_link_libraries(${PROJECT_NAME} PRIVATE arba-rsce)
+# Use arba-rsce release static target:
+target_link_libraries(${PROJECT_NAME}-static PRIVATE arba-rsce-static)
