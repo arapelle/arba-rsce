@@ -16,7 +16,7 @@ set_build_type_ifndef()
 set(PROJECT_NAME "arba-rsce")
 set(project_namespace "arba")
 set(project_base_name "rsce")
-set(PROJECT_VERSION 0.2.0)
+set(PROJECT_VERSION 0.3.0)
 project(${PROJECT_NAME}
         VERSION ${PROJECT_VERSION}
         DESCRIPTION "A C++ library providing tools for managing resources."
@@ -85,7 +85,6 @@ endif()
 
 ## Add tests:
 option_or_set_ifdef(BUILD_${PROJECT_NAME}_TESTS "Build ${PROJECT_NAME} tests or not" OFF BUILD_arba-arba_TESTS)
-option(BUILD_${PROJECT_NAME}_TESTS "Build ${PROJECT_NAME} tests or not" OFF)
 if(BUILD_${PROJECT_NAME}_TESTS AND BUILD_TESTING)
     add_subdirectory(test)
 endif()
