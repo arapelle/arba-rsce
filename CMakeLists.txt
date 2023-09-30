@@ -58,7 +58,7 @@ add_cpp_library(
 
 ## Link C++ targets:
 if(NOT TARGET arba-vlfs)
-    find_package(arba-vlfs 0.2.0 REQUIRED CONFIG)
+    find_package(arba-vlfs 0.3.0 REQUIRED CONFIG)
 endif()
 cpp_library_link_libraries(
     SHARED ${PROJECT_NAME}
