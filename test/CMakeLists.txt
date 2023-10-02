@@ -13,7 +13,7 @@ add_cpp_library_basic_tests(GTest::gtest
     SOURCES
         resource_store_tests.cpp
         basic_resource_manager_tests.cpp
-        basic_resource_manager_tests_2.cpp
+        basic_resource_manager_tests_mngr.cpp
         resource_manager_tests.cpp
-        resource_manager_tests_2.cpp
+        resource_manager_tests_mngr.cpp
 )

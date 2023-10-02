@@ -5,35 +5,8 @@
 #include <fstream>
 #include <functional>
 #include <array>
-
-class text
-{
-public:
-    std::string contents;
-
-    inline bool operator<=>(const text&) const = default;
-
-    bool load_from_file(const std::filesystem::path& fpath)
-    {
-        std::ifstream stream(fpath);
-        stream.seekg(0, std::ios::end);
-        contents.reserve(stream.tellg());
-        stream.seekg(0, std::ios::beg);
-        contents.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-        return true;
-    }
-};
-
-namespace std
-{
-template<> struct hash<text>
-{
-    std::size_t operator()(text const& value) const noexcept
-    {
-        return std::hash<std::string>{}(value.contents);
-    }
-};
-}
+#include "resources/text.hpp"
+#include "resources/resources_helper.hpp"
 
 static_assert(rsce::traits::is_loadable_resource_v<text>);
 
@@ -42,44 +15,6 @@ using text_sptr = rsce::resource_store<text>::resource_sptr;
 namespace rsce
 {
 template class default_resource_store<text>;
-}
-
-// Resources:
-
-const std::string& koro_contents()
-{
-    static std::string contents = "koro koro\nkoro";
-    return contents;
-}
-
-const std::string& tiki_contents()
-{
-    static std::string contents = "Tiki Tiki tiki.";
-    return contents;
-}
-
-std::filesystem::path rscdir()
-{
-    static std::filesystem::path dirpath = []()
-    {
-        auto path = std::filesystem::temp_directory_path()/"rsce/rsc";
-        std::filesystem::create_directories(path);
-        return path;
-    }();
-    return dirpath;
-}
-
-void create_resource_files()
-{
-    std::filesystem::path rsc = rscdir();
-
-    std::ofstream stream(rsc/"koro.txt");
-    stream << koro_contents();
-    stream.close();
-
-    stream.open(rsc/"tiki.txt");
-    stream << tiki_contents();
-    stream.close();
 }
 
 // Unit tests:

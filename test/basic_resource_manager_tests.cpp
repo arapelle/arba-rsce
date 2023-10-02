@@ -5,75 +5,10 @@
 #include <fstream>
 #include <functional>
 #include <array>
-
-class text
-{
-public:
-    std::string contents;
-
-    inline bool operator<=>(const text&) const = default;
-
-    bool load_from_file(const std::filesystem::path& fpath)
-    {
-        std::ifstream stream(fpath);
-        stream.seekg(0, std::ios::end);
-        contents.reserve(stream.tellg());
-        stream.seekg(0, std::ios::beg);
-        contents.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-        return true;
-    }
-};
-
-namespace std
-{
-template<> struct hash<text>
-{
-    std::size_t operator()(text const& value) const noexcept
-    {
-        return std::hash<std::string>{}(value.contents);
-    }
-};
-}
+#include "resources/text.hpp"
+#include "resources/resources_helper.hpp"
 
 using text_sptr = rsce::resource_store<text>::resource_sptr;
-
-// Resources:
-
-const std::string& koro_contents()
-{
-    static std::string contents = "koro koro\nkoro";
-    return contents;
-}
-
-const std::string& tiki_contents()
-{
-    static std::string contents = "Tiki Tiki tiki.";
-    return contents;
-}
-
-std::filesystem::path rscdir()
-{
-    static std::filesystem::path dirpath = []()
-    {
-        auto path = std::filesystem::temp_directory_path()/"rsce/rsc";
-        std::filesystem::create_directories(path);
-        return path;
-    }();
-    return dirpath;
-}
-
-void create_resource_files()
-{
-    std::filesystem::path rsc = rscdir();
-
-    std::ofstream stream(rsc/"koro.txt");
-    stream << koro_contents();
-    stream.close();
-
-    stream.open(rsc/"tiki.txt");
-    stream << tiki_contents();
-    stream.close();
-}
 
 // Unit tests:
 
@@ -82,18 +17,58 @@ TEST(basic_resource_manager_tests, test_constructor)
     arba::rsce::basic_resource_manager rmanager;
 }
 
-TEST(basic_resource_manager_tests, test_get)
+TEST(basic_resource_manager_tests, GetShared_ResourceFileExists_ExpectNoException)
 {
     std::filesystem::path rsc = rscdir();
 
-    rsce::basic_resource_manager rmanager;
-    text_sptr koro_sptr = rmanager.get_shared<text>(rsc/"koro.txt");
-    text_sptr koro_sptr_2 = rmanager.get_shared<text>(rsc/"koro.txt");
-    ASSERT_NE(koro_sptr, nullptr);
-    ASSERT_EQ(koro_sptr, koro_sptr_2);
-    ASSERT_EQ(koro_sptr->contents, koro_contents());
+    try
+    {
+        rsce::basic_resource_manager rmanager;
+        text_sptr koro_sptr = rmanager.get_shared<text>(rsc/"koro.txt");
+        text_sptr koro_sptr_2 = rmanager.get_shared<text>(rsc/"koro.txt");
+        ASSERT_NE(koro_sptr, nullptr);
+        ASSERT_EQ(koro_sptr, koro_sptr_2);
+        ASSERT_EQ(koro_sptr->contents, koro_contents());
 
-    ASSERT_EQ(rmanager.number_of_resources<text>(), 1);
+        ASSERT_EQ(rmanager.number_of_resources<text>(), 1);
+    }
+    catch (...)
+    {
+        FAIL();
+    }
+}
+
+TEST(basic_resource_manager_tests, GetShared_ResourceFileDoesNotExist_ExpectNotFoundException)
+{
+    std::filesystem::path rsc = rscdir();
+
+    try
+    {
+        rsce::basic_resource_manager rmanager;
+        text_sptr rsc_sptr = rmanager.get_shared<text>(rsc/"not_found.txt");
+        FAIL();
+    }
+    catch (const std::runtime_error& err)
+    {
+        // err.what() == ...
+        SUCCEED();
+    }
+}
+
+TEST(basic_resource_manager_tests, GetSharedNoThrow_ResourceFileDoesNotExist_ExpectNoException)
+{
+    std::filesystem::path rsc = rscdir();
+
+    try
+    {
+        rsce::basic_resource_manager rmanager;
+        text_sptr rsc_sptr = rmanager.get_shared<text>(rsc/"not_found.txt", std::nothrow);
+        ASSERT_EQ(rsc_sptr, nullptr);
+    }
+    catch (...)
+    {
+        FAIL();
+    }
 }
 
 TEST(basic_resource_manager_tests, test_get_ref)
@@ -149,6 +124,10 @@ TEST(basic_resource_manager_tests, test_set_2)
     ASSERT_EQ(tale_ptr, rmanager.get_shared<text>("default_tale").get());
     ASSERT_EQ(tale_ptr->contents, "Once upon a time 2");
 }
+
+// Load_ResourceFileExists_ExpectNoException
+// Load_ResourceFileDoesNotExist_ExpectNotFoundException
+// LoadNoThrow_ResourceFileDoesNotExist_ExpectNoException
 
 TEST(basic_resource_manager_tests, test_load)
 {
