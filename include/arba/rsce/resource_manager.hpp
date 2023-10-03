@@ -23,6 +23,21 @@ public:
     }
 
     template <class resource>
+    inline std::shared_ptr<resource> get_shared(const std::filesystem::path& rsc_path, std::nothrow_t)
+    {
+        try
+        {
+            std::filesystem::path real_path = vlfs_->real_path(rsc_path);
+            std::shared_ptr<resource> res = get_or_create_resource_store_<resource>().get_shared(real_path, *this);
+            return res;
+        }
+        catch (const std::runtime_error&)
+        {
+        }
+        return std::shared_ptr<resource>();
+    }
+
+    template <class resource>
     inline resource& get(const std::filesystem::path& rsc_path)
     {
         std::shared_ptr<resource> rsc_sptr = get_shared<resource>(rsc_path);
@@ -52,6 +67,18 @@ public:
     inline std::shared_ptr<resource> load(const std::filesystem::path& rsc_path)
     {
         return this->get_or_create_resource_store_<resource>().load(vlfs_->real_path(rsc_path), *this);
+    }
+
+    template <class resource>
+    inline std::shared_ptr<resource> load(const std::filesystem::path& rsc_path, std::nothrow_t)
+    {
+        try
+        {
+            return this->get_or_create_resource_store_<resource>().load(vlfs_->real_path(rsc_path), *this);
+        }
+        catch (const std::runtime_error&)
+        {
+        }
     }
 
     template <class resource>

@@ -3,7 +3,6 @@
 #include "resource_store.hpp"
 #include <typeinfo>
 #include <atomic>
-#include <cassert>
 
 inline namespace arba
 {
@@ -24,11 +23,22 @@ public:
     }
 
     template <class resource>
+    inline std::shared_ptr<resource> get_shared(const std::filesystem::path& rsc_path, std::nothrow_t)
+    {
+        try
+        {
+            return get_or_create_resource_store_<resource>().get_shared(rsc_path, *this);
+        }
+        catch (const std::runtime_error&)
+        {
+        }
+        return std::shared_ptr<resource>();
+    }
+
+    template <class resource>
     inline resource& get(const std::filesystem::path& rsc_path)
     {
-        std::shared_ptr<resource> rsc_sptr = get_shared<resource>(rsc_path);
-        assert(rsc_sptr);
-        return *rsc_sptr;
+        return *get_shared<resource>(rsc_path);
     }
 
     template <class resource>
@@ -53,6 +63,19 @@ public:
     inline std::shared_ptr<resource> load(const std::filesystem::path& rsc_path)
     {
         return get_or_create_resource_store_<resource>().load(rsc_path, *this);
+    }
+
+    template <class resource>
+    inline std::shared_ptr<resource> load(const std::filesystem::path& rsc_path, std::nothrow_t)
+    {
+        try
+        {
+            return get_or_create_resource_store_<resource>().load(rsc_path, *this);
+        }
+        catch (const std::runtime_error&)
+        {
+        }
+        return std::shared_ptr<resource>();
     }
 
     template <class resource>
@@ -81,9 +104,9 @@ protected:
         std::size_t rsc_type_index = resource_type_index_<resource>();
         if (rsc_type_index)
         {
-            std::ostringstream stream("No resource of this type is stored in this manager. Resource: ");
-            stream << typeid(resource).name();
-            throw std::invalid_argument(stream.str());
+            std::string err_str = std::format("No resource of this type is stored in this manager. Resource: {}",
+                                              typeid(resource).name());
+            throw std::invalid_argument(err_str);
         }
         return *static_cast<resource_store<resource>*>(resource_stores_[rsc_type_index].get());
     }

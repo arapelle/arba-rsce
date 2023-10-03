@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <functional>
 #include <cassert>
-#include <sstream>
+#include <format>
 #include <memory>
 #include <mutex>
 #include <concepts>
@@ -50,14 +50,13 @@ public:
     inline void        reserve(std::size_t capacity) { resources_.reserve(capacity); }
 
     resource_sptr get_shared(const std::filesystem::path& rsc_path);
+    template <class resource_manager_type>
+    resource_sptr get_shared(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
     bool          insert(const std::filesystem::path& rsc_path, resource_sptr resource);
     void          set(const std::filesystem::path& rsc_path, resource_sptr &&resource);
     void          set(const std::filesystem::path& rsc_path, resource_type&& resource);
     resource_sptr load(const std::filesystem::path& rsc_path);
     inline void   remove(const std::filesystem::path& rsc_path) { resources_.erase(rsc_path); }
-
-    template <class resource_manager_type>
-    resource_sptr get_shared(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
 
     template <class resource_manager_type>
     requires traits::is_loadable_resource_v<resource_type, resource_manager_type>
@@ -127,10 +126,9 @@ template <class resource_type>
 default_resource_store<resource_type>::resource_sptr
 default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path)
 {
-    if (std::filesystem::exists(rsc_path))
+    if (std::filesystem::exists(rsc_path)) [[likely]]
     {
-        //        std::cout << "loading the resource file " << rsc_path << ".";
-        if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path); resource)
+        if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path); resource) [[likely]]
         {
             std::lock_guard lock(mutex_);
             resources_.emplace(rsc_path, resource);
@@ -138,16 +136,15 @@ default_resource_store<resource_type>::load(const std::filesystem::path &rsc_pat
         }
         else
         {
-            std::ostringstream stream;
-            stream << "The resource file " << rsc_path << " wasn't loaded correctly (nullptr returned).";
-            std::runtime_error(stream.str());
+            std::string err_str = std::format("The resource file \"{}\" wasn't loaded correctly (nullptr returned).",
+                                              rsc_path.generic_string());
+            throw std::runtime_error(err_str);
         }
     }
     else
     {
-        std::ostringstream stream;
-        stream << "The resource file " << rsc_path << " does not exist.";
-        std::runtime_error(stream.str());
+        std::string err_str = std::format("The resource file \"{}\" does not exist.", rsc_path.generic_string());
+        throw std::runtime_error(err_str);
     }
 
     return nullptr;
@@ -161,8 +158,7 @@ default_resource_store<resource_type>::load(const std::filesystem::path &rsc_pat
 {
     if (std::filesystem::exists(rsc_path))
     {
-//        std::cout << "loading the resource file " << rsc_path << ".";
-        if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path, rsc_manager); resource)
+        if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path, rsc_manager); resource) [[likely]]
         {
             std::lock_guard lock(mutex_);
             resources_.emplace(rsc_path, resource);
@@ -170,16 +166,15 @@ default_resource_store<resource_type>::load(const std::filesystem::path &rsc_pat
         }
         else
         {
-            std::ostringstream stream;
-            stream << "The resource file " << rsc_path << " wasn't loaded correctly (nullptr returned).";
-            std::runtime_error(stream.str());
+            std::string err_str = std::format("The resource file \"{}\" wasn't loaded correctly (nullptr returned).",
+                                              rsc_path.generic_string());
+            throw std::runtime_error(err_str);
         }
     }
     else
     {
-        std::ostringstream stream;
-        stream << "The resource file " << rsc_path << " does not exist.";
-        std::runtime_error(stream.str());
+        std::string err_str = std::format("The resource file \"{}\" does not exist.", rsc_path.generic_string());
+        throw std::runtime_error(err_str);
     }
 
     return nullptr;
