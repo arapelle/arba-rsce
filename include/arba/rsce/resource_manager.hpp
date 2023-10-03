@@ -13,8 +13,8 @@ class resource_manager : public basic_resource_manager
 public:
     explicit resource_manager(vlfs::virtual_filesystem& vlfs) : vlfs_(&vlfs) {}
 
-    inline const vlfs::virtual_filesystem* virtual_filesystem() const { return vlfs_; }
-    inline vlfs::virtual_filesystem* virtual_filesystem() { return vlfs_; }
+    inline const vlfs::virtual_filesystem& virtual_filesystem() const { return *vlfs_; }
+    inline vlfs::virtual_filesystem& virtual_filesystem() { return *vlfs_; }
 
     template <class resource>
     inline std::shared_ptr<resource> get_shared(const std::filesystem::path& rsc_path)

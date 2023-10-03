@@ -16,7 +16,7 @@ TEST(resource_manager_tests, test_constructor)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
-    ASSERT_EQ(rmanager.virtual_filesystem(), &vlfs);
+    ASSERT_EQ(&rmanager.virtual_filesystem(), &vlfs);
 }
 
 TEST(resource_manager_tests, test_get)
