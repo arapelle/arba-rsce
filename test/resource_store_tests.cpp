@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 #include "resources/text.hpp"
 #include "resources/text_mngr.hpp"
+#include "resources/story.hpp"
+#include "resources/story_mngr.hpp"
 #include "resources/resources_helper.hpp"
 
 static_assert(rsce::traits::is_loadable_resource_v<text>);
@@ -45,6 +47,21 @@ TEST(resource_store_tests, get_shared__resource_file_exists__no_exception)
     }
 }
 
+TEST(resource_store_tests, get_shared__invalid_resource_file_exists__no_exception)
+{
+    std::filesystem::path rsc = rscdir();
+
+    rsce::resource_store<story> story_store;
+    try
+    {
+        std::shared_ptr koro_sptr = story_store.get_shared(rsc/"koro.txt");
+    }
+    catch (...)
+    {
+        ASSERT_EQ(story_store.size(), 0);
+    }
+}
+
 TEST(resource_store_tests, get_shared__resource_file_does_not_exist__not_found_exception)
 {
     std::filesystem::path rsc = rscdir();
@@ -61,7 +78,7 @@ TEST(resource_store_tests, get_shared__resource_file_does_not_exist__not_found_e
     }
 }
 
-TEST(resource_store_tests, get_shared__resource_file_does_not_exist_nothrow__no_exception)
+TEST(resource_store_tests, get_shared__resource_mngr_file_exists__no_exception)
 {
     std::filesystem::path rsc = rscdir();
     rsce::basic_resource_manager rmanager;
@@ -80,6 +97,22 @@ TEST(resource_store_tests, get_shared__resource_file_does_not_exist_nothrow__no_
     catch (...)
     {
         FAIL();
+    }
+}
+
+TEST(resource_store_tests, get_shared__invalid_resource_mngr_file_exists__no_exception)
+{
+    std::filesystem::path rsc = rscdir();
+    rsce::basic_resource_manager rmanager;
+
+    rsce::resource_store<story_mngr> story_store;
+    try
+    {
+        std::shared_ptr koro_sptr = story_store.get_shared(rsc/"koro.txt", rmanager);
+    }
+    catch (...)
+    {
+        ASSERT_EQ(story_store.size(), 0);
     }
 }
 

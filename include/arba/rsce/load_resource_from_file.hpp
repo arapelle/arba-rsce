@@ -24,6 +24,18 @@ std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::pa
     return std::shared_ptr<resource_type>();
 }
 
+template <class resource_type>
+    requires requires(resource_type& value, const std::filesystem::path& fpath)
+{
+    { value.load_from_file(fpath) } -> std::same_as<void>;
+}
+std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path)
+{
+    resource_type value;
+    value.load_from_file(path);
+    return std::make_shared<resource_type>(std::move(value));
+}
+
 template <class resource_type, class resource_manager_type>
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path, resource_manager_type& rsc_manager) = delete;
 
@@ -38,6 +50,18 @@ std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::pa
     if (value.load_from_file(path, rsc_manager))
         return std::make_shared<resource_type>(std::move(value));
     return std::shared_ptr<resource_type>();
+}
+
+template <class resource_type, class resource_manager_type>
+    requires requires(resource_type& value, const std::filesystem::path& fpath, resource_manager_type& rsc_manager)
+{
+    { value.load_from_file(fpath, rsc_manager) } -> std::same_as<void>;
+}
+std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path, resource_manager_type &rsc_manager)
+{
+    resource_type value;
+    value.load_from_file(path, rsc_manager);
+    return std::make_shared<resource_type>(std::move(value));
 }
 
 namespace concepts
