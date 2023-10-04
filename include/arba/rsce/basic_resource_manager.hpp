@@ -29,7 +29,7 @@ public:
         {
             return get_or_create_resource_store_<resource>().get_shared(rsc_path, *this);
         }
-        catch (const std::runtime_error&)
+        catch (const std::exception&)
         {
         }
         return std::shared_ptr<resource>();
@@ -72,7 +72,7 @@ public:
         {
             return get_or_create_resource_store_<resource>().load(rsc_path, *this);
         }
-        catch (const std::runtime_error&)
+        catch (const std::exception&)
         {
         }
         return std::shared_ptr<resource>();
