@@ -12,14 +12,14 @@ using text_sptr = rsce::resource_store<text>::resource_sptr;
 
 // Unit tests:
 
-TEST(resource_manager_tests, test_constructor)
+TEST(resource_manager_tests, constructor__no_arg__no_error)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
     ASSERT_EQ(&rmanager.virtual_filesystem(), &vlfs);
 }
 
-TEST(resource_manager_tests, test_get)
+TEST(resource_manager_tests, get_shared__resource_file_exists__no_exception)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -34,7 +34,7 @@ TEST(resource_manager_tests, test_get)
     ASSERT_EQ(rmanager.number_of_resources<text>(), 1);
 }
 
-TEST(resource_manager_tests, test_get_ref)
+TEST(resource_manager_tests, get__resource_file_exists__no_exception)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -47,7 +47,7 @@ TEST(resource_manager_tests, test_get_ref)
     ASSERT_EQ(&koro_ref, &koro_ref2);
 }
 
-TEST(resource_manager_tests, test_insert)
+TEST(resource_manager_tests, insert__rsc_sptr__no_error)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
@@ -61,7 +61,7 @@ TEST(resource_manager_tests, test_insert)
     ASSERT_EQ(tale_sptr, rmanager.get_shared<text>("default_tale"));
 }
 
-TEST(resource_manager_tests, test_set)
+TEST(resource_manager_tests, set__rsc_sptr__no_error)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
@@ -77,22 +77,7 @@ TEST(resource_manager_tests, test_set)
     ASSERT_EQ(tale_2_ptr->contents, "Once upon a time 2");
 }
 
-TEST(resource_manager_tests, test_set_2)
-{
-    vlfs::virtual_filesystem vlfs = create_vlfs();
-    rsce::resource_manager rmanager(vlfs);
-    text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
-    text* tale_ptr = tale_sptr.get();
-    rmanager.set<text>("default_tale", std::move(tale_sptr));
-    ASSERT_EQ(tale_ptr, rmanager.get_shared<text>("default_tale").get());
-    ASSERT_EQ(tale_ptr->contents, "Once upon a time");
-    text tale_2{"Once upon a time 2"};
-    rmanager.set<text>("default_tale", std::move(tale_2));
-    ASSERT_EQ(tale_ptr, rmanager.get_shared<text>("default_tale").get());
-    ASSERT_EQ(tale_ptr->contents, "Once upon a time 2");
-}
-
-TEST(resource_manager_tests, test_load)
+TEST(resource_manager_tests, load__resource_file_exists__expect_no_exception)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -107,7 +92,7 @@ TEST(resource_manager_tests, test_load)
     ASSERT_EQ(koro_sptr->contents, koro_2_sptr->contents);
 }
 
-TEST(resource_manager_tests, test_remove)
+TEST(resource_manager_tests, remove__rsc_path__no_error)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -122,7 +107,7 @@ TEST(resource_manager_tests, test_remove)
     ASSERT_EQ(rmanager.number_of_resources<text>(), 0);
 }
 
-TEST(resource_manager_tests, test_get_vlfs)
+TEST(resource_manager_tests, get_shared__vlfs_resource_file_exists__no_exception)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -137,7 +122,7 @@ TEST(resource_manager_tests, test_get_vlfs)
     ASSERT_EQ(rmanager.number_of_resources<text>(), 1);
 }
 
-TEST(resource_manager_tests, test_get_ref_vlfs)
+TEST(resource_manager_tests, get__vlfs_resource_file_exists__no_exception)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -150,7 +135,7 @@ TEST(resource_manager_tests, test_get_ref_vlfs)
     ASSERT_EQ(&koro_ref, &koro_ref2);
 }
 
-TEST(resource_manager_tests, test_insert_vlfs)
+TEST(resource_manager_tests, insert__vlfs_rsc_sptr__no_error)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
@@ -164,7 +149,7 @@ TEST(resource_manager_tests, test_insert_vlfs)
     ASSERT_EQ(tale_sptr, rmanager.get_shared<text>("default_tale"));
 }
 
-TEST(resource_manager_tests, test_set_vlfs)
+TEST(resource_manager_tests, set__vlfs_rsc_sptr__no_error)
 {
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
@@ -180,22 +165,7 @@ TEST(resource_manager_tests, test_set_vlfs)
     ASSERT_EQ(tale_2_ptr->contents, "Once upon a time 2");
 }
 
-TEST(resource_manager_tests, test_set_2_vlfs)
-{
-    vlfs::virtual_filesystem vlfs = create_vlfs();
-    rsce::resource_manager rmanager(vlfs);
-    text_sptr tale_sptr = std::make_shared<text>("Once upon a time");
-    text* tale_ptr = tale_sptr.get();
-    rmanager.set<text>("default_tale", std::move(tale_sptr));
-    ASSERT_EQ(tale_ptr, rmanager.get_shared<text>("default_tale").get());
-    ASSERT_EQ(tale_ptr->contents, "Once upon a time");
-    text tale_2{"Once upon a time 2"};
-    rmanager.set<text>("default_tale", std::move(tale_2));
-    ASSERT_EQ(tale_ptr, rmanager.get_shared<text>("default_tale").get());
-    ASSERT_EQ(tale_ptr->contents, "Once upon a time 2");
-}
-
-TEST(resource_manager_tests, test_load_vlfs)
+TEST(resource_manager_tests, load__vlfs_resource_file_exists__expect_no_exception)
 {
     std::filesystem::path rsc = rscdir();
 
@@ -210,7 +180,7 @@ TEST(resource_manager_tests, test_load_vlfs)
     ASSERT_EQ(koro_sptr->contents, koro_2_sptr->contents);
 }
 
-TEST(resource_manager_tests, test_remove_vlfs)
+TEST(resource_manager_tests, remove__vlfs_rsc_path__no_error)
 {
     std::filesystem::path rsc = rscdir();
 
