@@ -53,8 +53,7 @@ public:
     template <class resource_manager_type>
     resource_sptr get_shared(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
     bool          insert(const std::filesystem::path& rsc_path, resource_sptr resource);
-    void          set(const std::filesystem::path& rsc_path, resource_sptr &&resource);
-    void          set(const std::filesystem::path& rsc_path, resource_type&& resource);
+    void          set(const std::filesystem::path& rsc_path, resource_sptr resource);
     resource_sptr load(const std::filesystem::path& rsc_path);
     inline void   remove(const std::filesystem::path& rsc_path) { resources_.erase(rsc_path); }
 
@@ -105,21 +104,10 @@ bool default_resource_store<resource_type>::insert(const std::filesystem::path &
 }
 
 template <class resource_type>
-void default_resource_store<resource_type>::set(const std::filesystem::path &rsc_path, resource_sptr &&resource)
+void default_resource_store<resource_type>::set(const std::filesystem::path &rsc_path, resource_sptr resource)
 {
     std::lock_guard lock(mutex_);
     resources_[rsc_path] = std::move(resource);
-}
-
-template <class resource_type>
-void default_resource_store<resource_type>::set(const std::filesystem::path &rsc_path, resource_type &&resource)
-{
-    std::lock_guard lock(mutex_);
-    resource_sptr& rsc_sptr = resources_[rsc_path];
-    if (rsc_sptr)
-        *rsc_sptr = std::move(resource);
-    else
-        rsc_sptr = std::make_shared<resource_type>(std::move(resource));
 }
 
 template <class resource_type>

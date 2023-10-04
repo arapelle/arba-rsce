@@ -54,12 +54,6 @@ public:
     }
 
     template <class resource>
-    inline void set(const std::filesystem::path& rsc_path, resource&& rsc)
-    {
-        get_or_create_resource_store_<resource>().set(rsc_path, std::move(rsc));
-    }
-
-    template <class resource>
     inline std::shared_ptr<resource> load(const std::filesystem::path& rsc_path)
     {
         return get_or_create_resource_store_<resource>().load(rsc_path, *this);

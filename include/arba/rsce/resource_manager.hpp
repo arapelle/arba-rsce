@@ -58,12 +58,6 @@ public:
     }
 
     template <class resource>
-    inline void set(const std::filesystem::path& rsc_path, resource&& rsc)
-    {
-        this->basic_resource_manager::set<resource>(vlfs_->real_path(rsc_path), std::move(rsc));
-    }
-
-    template <class resource>
     inline std::shared_ptr<resource> load(const std::filesystem::path& rsc_path)
     {
         return this->get_or_create_resource_store_<resource>().load(vlfs_->real_path(rsc_path), *this);
