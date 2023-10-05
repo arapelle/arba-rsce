@@ -41,7 +41,6 @@ public:
     inline resource& get(const std::filesystem::path& rsc_path)
     {
         std::shared_ptr<resource> rsc_sptr = get_shared<resource>(rsc_path);
-        assert(rsc_sptr);
         return *rsc_sptr;
     }
 

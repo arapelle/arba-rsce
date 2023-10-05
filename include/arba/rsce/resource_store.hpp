@@ -1,10 +1,11 @@
 #pragma once
 
 #include "load_resource_from_file.hpp"
+#include <arba/core/debug/assert.hpp>
+#include <arba/core/io/check_file.hpp>
 #include <unordered_map>
 #include <filesystem>
 #include <functional>
-#include <cassert>
 #include <format>
 #include <memory>
 #include <mutex>
@@ -98,7 +99,7 @@ default_resource_store<resource_type>::get_shared(const std::filesystem::path &r
 template <class resource_type>
 bool default_resource_store<resource_type>::insert(const std::filesystem::path &rsc_path, resource_sptr resource)
 {
-    assert(resource);
+    ARBA_ASSERT(resource);
     std::lock_guard lock(mutex_);
     return resources_.insert(typename resource_dico::value_type(rsc_path, std::move(resource))).second;
 }
@@ -106,6 +107,7 @@ bool default_resource_store<resource_type>::insert(const std::filesystem::path &
 template <class resource_type>
 void default_resource_store<resource_type>::set(const std::filesystem::path &rsc_path, resource_sptr resource)
 {
+    ARBA_ASSERT(resource);
     std::lock_guard lock(mutex_);
     resources_[rsc_path] = std::move(resource);
 }
@@ -114,24 +116,18 @@ template <class resource_type>
 default_resource_store<resource_type>::resource_sptr
 default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path)
 {
-    if (std::filesystem::exists(rsc_path)) [[likely]]
+    core::check_input_file(rsc_path);
+
+    if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path); resource) [[likely]]
     {
-        if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path); resource) [[likely]]
-        {
-            std::lock_guard lock(mutex_);
-            resources_.emplace(rsc_path, resource);
-            return resource;
-        }
-        else
-        {
-            std::string err_str = std::format("The resource file \"{}\" wasn't loaded correctly (nullptr returned).",
-                                              rsc_path.generic_string());
-            throw std::runtime_error(err_str);
-        }
+        std::lock_guard lock(mutex_);
+        resources_.emplace(rsc_path, resource);
+        return resource;
     }
     else
     {
-        std::string err_str = std::format("The resource file \"{}\" does not exist.", rsc_path.generic_string());
+        std::string err_str = std::format("The resource file \"{}\" wasn't loaded correctly (nullptr returned).",
+                                          rsc_path.generic_string());
         throw std::runtime_error(err_str);
     }
 
@@ -144,24 +140,18 @@ requires traits::is_loadable_resource_v<resource_type, resource_manager_type>
 default_resource_store<resource_type>::resource_sptr
 default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path, resource_manager_type& rsc_manager)
 {
-    if (std::filesystem::exists(rsc_path))
+    core::check_input_file(rsc_path);
+
+    if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path, rsc_manager); resource) [[likely]]
     {
-        if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path, rsc_manager); resource) [[likely]]
-        {
-            std::lock_guard lock(mutex_);
-            resources_.emplace(rsc_path, resource);
-            return resource;
-        }
-        else
-        {
-            std::string err_str = std::format("The resource file \"{}\" wasn't loaded correctly (nullptr returned).",
-                                              rsc_path.generic_string());
-            throw std::runtime_error(err_str);
-        }
+        std::lock_guard lock(mutex_);
+        resources_.emplace(rsc_path, resource);
+        return resource;
     }
     else
     {
-        std::string err_str = std::format("The resource file \"{}\" does not exist.", rsc_path.generic_string());
+        std::string err_str = std::format("The resource file \"{}\" wasn't loaded correctly (nullptr returned).",
+                                          rsc_path.generic_string());
         throw std::runtime_error(err_str);
     }
 
