@@ -55,16 +55,19 @@ public:
     resource_sptr get_shared(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
     bool          insert(const std::filesystem::path& rsc_path, resource_sptr resource);
     void          set(const std::filesystem::path& rsc_path, resource_sptr resource);
-    resource_sptr load(const std::filesystem::path& rsc_path);
+    inline resource_sptr load(const std::filesystem::path& rsc_path);
     inline void   remove(const std::filesystem::path& rsc_path) { resources_.erase(rsc_path); }
 
     template <class resource_manager_type>
     requires traits::is_loadable_resource_v<resource_type, resource_manager_type>
-    resource_sptr load(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
+    inline resource_sptr load(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
 
     template <class resource_manager_type>
     requires (!traits::is_loadable_resource_v<resource_type, resource_manager_type>)
     resource_sptr load(const std::filesystem::path& rsc_path, resource_manager_type&) { return load(rsc_path); }
+
+private:
+    resource_sptr emplace_if_valid_(const std::filesystem::path& rsc_path, resource_sptr rsc_sptr);
 
 private:
     resource_dico resources_;
@@ -117,21 +120,8 @@ default_resource_store<resource_type>::resource_sptr
 default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path)
 {
     core::check_input_file(rsc_path);
-
-    if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path); resource) [[likely]]
-    {
-        std::lock_guard lock(mutex_);
-        resources_.emplace(rsc_path, resource);
-        return resource;
-    }
-    else
-    {
-        std::string err_str = std::format("The resource file \"{}\" wasn't loaded correctly (nullptr returned).",
-                                          rsc_path.generic_string());
-        throw std::runtime_error(err_str);
-    }
-
-    return nullptr;
+    resource_sptr rsc_sptr = load_resource_from_file<resource_type>(rsc_path);
+    return emplace_if_valid_(rsc_path, std::move(rsc_sptr));
 }
 
 template <class resource_type>
@@ -141,21 +131,26 @@ default_resource_store<resource_type>::resource_sptr
 default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path, resource_manager_type& rsc_manager)
 {
     core::check_input_file(rsc_path);
+    resource_sptr rsc_sptr = load_resource_from_file<resource_type>(rsc_path, rsc_manager);
+    return emplace_if_valid_(rsc_path, std::move(rsc_sptr));
+}
 
-    if (resource_sptr resource = load_resource_from_file<resource_type>(rsc_path, rsc_manager); resource) [[likely]]
+template <class resource_type>
+default_resource_store<resource_type>::resource_sptr
+default_resource_store<resource_type>::emplace_if_valid_(const std::filesystem::path& rsc_path, resource_sptr rsc_sptr)
+{
+    if (rsc_sptr) [[likely]]
     {
         std::lock_guard lock(mutex_);
-        resources_.emplace(rsc_path, resource);
-        return resource;
+        resources_.emplace(rsc_path, rsc_sptr);
+        return rsc_sptr;
     }
     else
     {
-        std::string err_str = std::format("The resource file \"{}\" wasn't loaded correctly (nullptr returned).",
+        std::string err_str = std::format("The resource file \"{}\" was not loaded correctly (nullptr returned).",
                                           rsc_path.generic_string());
         throw std::runtime_error(err_str);
     }
-
-    return nullptr;
 }
 
 template <class resource_type>
