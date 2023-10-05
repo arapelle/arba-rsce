@@ -1,6 +1,7 @@
 #pragma once
 
 #include "resource_store.hpp"
+#include <shared_mutex>
 #include <typeinfo>
 #include <atomic>
 
@@ -94,8 +95,8 @@ protected:
     template <class resource>
     inline resource_store<resource>& get_store_()
     {
-        std::lock_guard lock(mutex_);
         std::size_t rsc_type_index = resource_type_index_<resource>();
+        std::shared_lock lock(mutex_);
         if (rsc_type_index >= resource_stores_.size()) [[unlikely]]
             throw_resource_store_is_missing_<resource>();
         resource_store_base* resource_store_ptr = resource_stores_[rsc_type_index].get();
@@ -115,20 +116,27 @@ protected:
     template <class resource>
     inline resource_store<resource>& get_or_create_resource_store_()
     {
-        std::lock_guard lock(mutex_);
+        std::size_t rsc_type_index = resource_type_index_<resource>();
 
-        std::size_t index = resource_type_index_<resource>();
-        if (index >= resource_stores_.size())
-            resource_stores_.resize(index + 1);
-
-        resource_store_interface_uptr& resource_store_uptr = resource_stores_[index];
-        if (!resource_store_uptr)
+        resource_store_base* resource_store_ptr = nullptr;
         {
-            resource_store_interface_uptr n_event = std::make_unique<resource_store<resource>>();
-            resource_store_uptr = std::move(n_event);
+            std::shared_lock lock(mutex_);
+            if (rsc_type_index < resource_stores_.size()) [[likely]]
+                resource_store_ptr = resource_stores_[rsc_type_index].get();
         }
 
-        return *static_cast<resource_store<resource>*>(resource_store_uptr.get());
+        if (!resource_store_ptr) [[unlikely]]
+        {
+            std::unique_lock lock(mutex_);
+            std::size_t min_required_size = rsc_type_index + 1;
+            if (min_required_size > resource_stores_.size())
+                resource_stores_.resize(min_required_size);
+            std::unique_ptr rsc_store_uptr = std::make_unique<resource_store<resource>>();
+            resource_store_ptr = rsc_store_uptr.get();
+            resource_stores_[rsc_type_index] = std::move(rsc_store_uptr);
+        }
+
+        return *static_cast<resource_store<resource>*>(resource_store_ptr);
     }
 
     inline static std::size_t generate_resource_type_index_()
@@ -148,7 +156,7 @@ protected:
 
 private:
     std::vector<resource_store_interface_uptr> resource_stores_;
-    std::recursive_mutex mutex_;
+    mutable std::shared_mutex mutex_;
 };
 
 }
