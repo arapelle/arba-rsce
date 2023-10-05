@@ -15,7 +15,8 @@ Binaries:
 - CMake 3.26 or later
 
 Libraries:
-- [arba-vlfs](https://github.com/arapelle/arba-vlfs) 0.2.0
+- [arba-core](https://github.com/arapelle/arba-core) 0.18.0
+- [arba-vlfs](https://github.com/arapelle/arba-vlfs) 0.3.0
 
 Testing Libraries (optional):
 - [Google Test](https://github.com/google/googletest) 1.13 or later  (optional)

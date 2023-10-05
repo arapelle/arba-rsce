@@ -57,13 +57,16 @@ add_cpp_library(
 )
 
 ## Link C++ targets:
+if(NOT TARGET arba-core)
+    find_package(arba-core 0.18.0 REQUIRED CONFIG)
+endif()
 if(NOT TARGET arba-vlfs)
     find_package(arba-vlfs 0.3.0 REQUIRED CONFIG)
 endif()
 cpp_library_link_libraries(
     SHARED ${PROJECT_NAME}
     STATIC ${PROJECT_NAME}-static
-    PUBLIC arba-vlfs
+    PUBLIC arba-core arba-vlfs
 )
 
 ## Install C++ library:
