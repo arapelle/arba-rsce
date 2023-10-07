@@ -34,7 +34,7 @@ TEST(resource_store_tests, get_shared__resource_file_exists__no_exception)
     {
         rsce::resource_store<text> text_store;
         text_sptr koro_sptr = text_store.get_shared(rsc/"koro.txt");
-        text_sptr koro_sptr_2 = text_store.get_shared(rsc/"koro.txt");
+        text_sptr koro_sptr_2 = text_store.get_shared(rsc/".."/rsc.filename()/"koro.txt");
         ASSERT_NE(koro_sptr, nullptr);
         ASSERT_EQ(koro_sptr, koro_sptr_2);
         ASSERT_EQ(koro_sptr->contents, koro_contents());

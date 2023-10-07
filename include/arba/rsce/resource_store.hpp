@@ -50,23 +50,23 @@ public:
     inline void        clear() { resources_.clear(); }
     inline void        reserve(std::size_t capacity) { resources_.reserve(capacity); }
 
-    resource_sptr get_shared(const std::filesystem::path& rsc_path);
     template <class resource_manager_type>
     resource_sptr get_shared(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
-    bool          insert(const std::filesystem::path& rsc_path, resource_sptr resource);
-    void          set(const std::filesystem::path& rsc_path, resource_sptr resource);
-    inline resource_sptr load(const std::filesystem::path& rsc_path);
-    inline void   remove(const std::filesystem::path& rsc_path) { resources_.erase(rsc_path); }
+    resource_sptr get_shared(const std::filesystem::path& rsc_path);
 
     template <class resource_manager_type>
-    requires traits::is_loadable_resource_v<resource_type, resource_manager_type>
     inline resource_sptr load(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
+    inline resource_sptr load(const std::filesystem::path& rsc_path);
 
-    template <class resource_manager_type>
-    requires (!traits::is_loadable_resource_v<resource_type, resource_manager_type>)
-    resource_sptr load(const std::filesystem::path& rsc_path, resource_manager_type&) { return load(rsc_path); }
+    inline bool insert(const std::filesystem::path& rsc_path, resource_sptr resource);
+    inline void set(const std::filesystem::path& rsc_path, resource_sptr resource);
+    inline void remove(const std::filesystem::path& rsc_path);
 
 private:
+    inline resource_sptr load_canonical_(const std::filesystem::path& rsc_path);
+    template <class resource_manager_type>
+        requires traits::is_loadable_resource_v<resource_type, resource_manager_type>
+    inline resource_sptr load_canonical_(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
     resource_sptr emplace_if_valid_(const std::filesystem::path& rsc_path, resource_sptr rsc_sptr);
 
 private:
@@ -77,26 +77,109 @@ private:
 // Template methods implementation:
 
 template <class resource_type>
-default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::get_shared(const std::filesystem::path &rsc_path)
-{
-    std::lock_guard lock(mutex_);
-    auto iter = resources_.find(rsc_path);
-    if (iter != resources_.end())
-        return iter->second;
-    return load(rsc_path);
-}
-
-template <class resource_type>
 template <class resource_manager_type>
 default_resource_store<resource_type>::resource_sptr
 default_resource_store<resource_type>::get_shared(const std::filesystem::path &rsc_path, resource_manager_type& rsc_manager)
 {
     std::lock_guard lock(mutex_);
+
     auto iter = resources_.find(rsc_path);
     if (iter != resources_.end())
         return iter->second;
-    return load(rsc_path, rsc_manager);
+
+    std::filesystem::path c_rsc_path = std::filesystem::canonical(rsc_path);
+    iter = resources_.find(c_rsc_path);
+    if (iter != resources_.end())
+        return iter->second;
+
+    if constexpr (traits::is_loadable_resource_v<resource_type, resource_manager_type>)
+    {
+        return load_canonical_(c_rsc_path, rsc_manager);
+    }
+    else
+    {
+        return load_canonical_(c_rsc_path);
+    }
+}
+
+template <class resource_type>
+default_resource_store<resource_type>::resource_sptr
+default_resource_store<resource_type>::get_shared(const std::filesystem::path &rsc_path)
+{
+    std::lock_guard lock(mutex_);
+
+    auto iter = resources_.find(rsc_path);
+    if (iter != resources_.end())
+        return iter->second;
+
+    std::filesystem::path c_rsc_path = std::filesystem::canonical(rsc_path);
+    iter = resources_.find(c_rsc_path);
+    if (iter != resources_.end())
+        return iter->second;
+
+    return load_canonical_(c_rsc_path);
+}
+
+template <class resource_type>
+template <class resource_manager_type>
+default_resource_store<resource_type>::resource_sptr
+default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path, resource_manager_type& rsc_manager)
+{
+    std::filesystem::path c_rsc_path = std::filesystem::canonical(rsc_path);
+    if constexpr (traits::is_loadable_resource_v<resource_type, resource_manager_type>)
+    {
+        return load_canonical_(c_rsc_path, rsc_manager);
+    }
+    else
+    {
+        return load_canonical_(c_rsc_path);
+    }
+}
+
+template <class resource_type>
+default_resource_store<resource_type>::resource_sptr
+default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path)
+{
+    std::filesystem::path c_rsc_path = std::filesystem::canonical(rsc_path);
+    return load_canonical_(c_rsc_path);
+}
+
+template <class resource_type>
+default_resource_store<resource_type>::resource_sptr
+default_resource_store<resource_type>::load_canonical_(const std::filesystem::path &c_rsc_path)
+{
+    core::check_input_file(c_rsc_path);
+    resource_sptr rsc_sptr = load_resource_from_file<resource_type>(c_rsc_path);
+    return emplace_if_valid_(c_rsc_path, std::move(rsc_sptr));
+}
+
+template <class resource_type>
+template <class resource_manager_type>
+    requires traits::is_loadable_resource_v<resource_type, resource_manager_type>
+default_resource_store<resource_type>::resource_sptr
+default_resource_store<resource_type>::load_canonical_(const std::filesystem::path &c_rsc_path, resource_manager_type& rsc_manager)
+{
+    core::check_input_file(c_rsc_path);
+    resource_sptr rsc_sptr = load_resource_from_file<resource_type>(c_rsc_path, rsc_manager);
+    return emplace_if_valid_(c_rsc_path, std::move(rsc_sptr));
+}
+
+template <class resource_type>
+default_resource_store<resource_type>::resource_sptr
+default_resource_store<resource_type>::emplace_if_valid_(const std::filesystem::path& c_rsc_path, resource_sptr rsc_sptr)
+{
+    if (rsc_sptr) [[likely]]
+    {
+        std::lock_guard lock(mutex_);
+        resources_.emplace(c_rsc_path, rsc_sptr);
+        return rsc_sptr;
+    }
+    else
+    {
+        std::string err_str = std::format("The resource file \"{}\" was not loaded correctly (nullptr returned).",
+                                          c_rsc_path.generic_string());
+        throw std::runtime_error(err_str);
+    }
 }
 
 template <class resource_type>
@@ -116,41 +199,10 @@ void default_resource_store<resource_type>::set(const std::filesystem::path &rsc
 }
 
 template <class resource_type>
-default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path)
+void default_resource_store<resource_type>::remove(const std::filesystem::path& rsc_path)
 {
-    core::check_input_file(rsc_path);
-    resource_sptr rsc_sptr = load_resource_from_file<resource_type>(rsc_path);
-    return emplace_if_valid_(rsc_path, std::move(rsc_sptr));
-}
-
-template <class resource_type>
-template <class resource_manager_type>
-requires traits::is_loadable_resource_v<resource_type, resource_manager_type>
-default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path, resource_manager_type& rsc_manager)
-{
-    core::check_input_file(rsc_path);
-    resource_sptr rsc_sptr = load_resource_from_file<resource_type>(rsc_path, rsc_manager);
-    return emplace_if_valid_(rsc_path, std::move(rsc_sptr));
-}
-
-template <class resource_type>
-default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::emplace_if_valid_(const std::filesystem::path& rsc_path, resource_sptr rsc_sptr)
-{
-    if (rsc_sptr) [[likely]]
-    {
-        std::lock_guard lock(mutex_);
-        resources_.emplace(rsc_path, rsc_sptr);
-        return rsc_sptr;
-    }
-    else
-    {
-        std::string err_str = std::format("The resource file \"{}\" was not loaded correctly (nullptr returned).",
-                                          rsc_path.generic_string());
-        throw std::runtime_error(err_str);
-    }
+    if (resources_.erase(rsc_path) == 0)
+        resources_.erase(std::filesystem::canonical(rsc_path));
 }
 
 template <class resource_type>
