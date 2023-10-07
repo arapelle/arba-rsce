@@ -10,6 +10,14 @@
 
 using text_sptr = rsce::resource_store<text>::resource_sptr;
 
+class red_text : public text
+{
+};
+
+class green_text : public text
+{
+};
+
 // Unit tests:
 
 TEST(basic_resource_manager_tests, constructor__no_arg__no_error)
@@ -179,6 +187,28 @@ TEST(basic_resource_manager_tests, remove__rsc_path__no_error)
     ASSERT_EQ(rmanager.number_of_resources<text>(), 0);
     rmanager.remove<text>(rsc/"tiki.txt");
     ASSERT_EQ(rmanager.number_of_resources<text>(), 0);
+
+    rmanager.load<red_text>(rsc/"tiki.txt");
+    ASSERT_EQ(rmanager.number_of_resources<red_text>(), 1);
+    rmanager.remove<red_text>(rsc/"tiki.txt");
+    ASSERT_EQ(rmanager.number_of_resources<text>(), 0);
+}
+
+TEST(basic_resource_manager_tests, remove__rsc_path_missing_resource_store__invalid_arg_exception)
+{
+    std::filesystem::path rsc = rscdir();
+
+    rsce::basic_resource_manager rmanager;
+    text_sptr koro_sptr = rmanager.load<red_text>(rsc/"koro.txt");
+    rmanager.load<green_text>(rsc/"tiki.txt");
+    try
+    {
+        rmanager.remove<green_text>(rsc/"tiki.txt");
+    }
+    catch (const std::invalid_argument& ex)
+    {
+        ASSERT_EQ(rmanager.number_of_resources<red_text>(), 1);
+    }
 }
 
 TEST(basic_resource_manager_tests, store__no_arg__no_error)
@@ -192,14 +222,6 @@ TEST(basic_resource_manager_tests, store__no_arg__no_error)
     ASSERT_EQ(text_store.size(), 1);
     ASSERT_EQ(tiki_sptr, tiki_sptr_2);
 }
-
-class red_text : public text
-{
-};
-
-class green_text : public text
-{
-};
 
 TEST(basic_resource_manager_tests, test_unordered_store_creation)
 {

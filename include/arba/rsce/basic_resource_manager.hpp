@@ -96,13 +96,20 @@ protected:
     {
         std::lock_guard lock(mutex_);
         std::size_t rsc_type_index = resource_type_index_<resource>();
-        if (rsc_type_index)
-        {
-            std::string err_str = std::format("No resource of this type is stored in this manager. Resource: {}",
-                                              typeid(resource).name());
-            throw std::invalid_argument(err_str);
-        }
-        return *static_cast<resource_store<resource>*>(resource_stores_[rsc_type_index].get());
+        if (rsc_type_index >= resource_stores_.size()) [[unlikely]]
+            throw_resource_store_is_missing_<resource>();
+        resource_store_base* resource_store_ptr = resource_stores_[rsc_type_index].get();
+        if (!resource_store_ptr) [[unlikely]]
+            throw_resource_store_is_missing_<resource>();
+        return *static_cast<resource_store<resource>*>(resource_store_ptr);
+    }
+
+    template <class resource>
+    inline void throw_resource_store_is_missing_()
+    {
+        std::string err_str = std::format("No resource of this type is stored in this manager. Resource: {}",
+                                          typeid(resource).name());
+        throw std::invalid_argument(err_str);
     }
 
     template <class resource>

@@ -24,7 +24,7 @@ inline std::filesystem::path rscdir()
 {
     static const std::filesystem::path dirpath = []
     {
-        auto path = std::filesystem::temp_directory_path()/"rsce/rsc";
+        auto path = std::filesystem::temp_directory_path() / "arba/rsce" / "rsc";
         std::filesystem::create_directories(path);
         return path;
     }();
@@ -52,7 +52,7 @@ inline vlfs::virtual_filesystem create_vlfs()
 {
     vlfs::virtual_filesystem vlfs;
     vlfs.set_virtual_root(strn::string64("TMP"), std::filesystem::temp_directory_path());
-    vlfs.set_virtual_root(strn::string64("RSCE"), "TMP:/rsce");
+    vlfs.set_virtual_root(strn::string64("RSCE"), "TMP:/arba/rsce");
     vlfs.set_virtual_root(strn::string64("RSC"), "RSCE:/rsc");
     return vlfs;
 }
