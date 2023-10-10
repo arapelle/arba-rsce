@@ -2,7 +2,6 @@
 
 #include "load_resource_from_file.hpp"
 #include <arba/core/debug/assert.hpp>
-#include <arba/core/io/check_file.hpp>
 #include <unordered_map>
 #include <filesystem>
 #include <functional>
@@ -148,7 +147,6 @@ template <class resource_type>
 default_resource_store<resource_type>::resource_sptr
 default_resource_store<resource_type>::load_canonical_(const std::filesystem::path &c_rsc_path)
 {
-    core::check_input_file(c_rsc_path);
     resource_sptr rsc_sptr = load_resource_from_file<resource_type>(c_rsc_path);
     return emplace_if_valid_(c_rsc_path, std::move(rsc_sptr));
 }
@@ -159,7 +157,6 @@ template <class resource_manager_type>
 default_resource_store<resource_type>::resource_sptr
 default_resource_store<resource_type>::load_canonical_(const std::filesystem::path &c_rsc_path, resource_manager_type& rsc_manager)
 {
-    core::check_input_file(c_rsc_path);
     resource_sptr rsc_sptr = load_resource_from_file<resource_type>(c_rsc_path, rsc_manager);
     return emplace_if_valid_(c_rsc_path, std::move(rsc_sptr));
 }
