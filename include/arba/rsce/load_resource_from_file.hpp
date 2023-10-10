@@ -18,9 +18,9 @@ requires requires(resource_type& value, const std::filesystem::path& fpath)
 }
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path)
 {
-    resource_type value;
-    if (value.load_from_file(path))
-        return std::make_shared<resource_type>(std::move(value));
+    if (std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
+        rsc_sptr->load_from_file(path)) [[likely]]
+        return rsc_sptr;
     return std::shared_ptr<resource_type>();
 }
 
@@ -31,9 +31,9 @@ template <class resource_type>
 }
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path)
 {
-    resource_type value;
-    value.load_from_file(path);
-    return std::make_shared<resource_type>(std::move(value));
+    std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
+    rsc_sptr->load_from_file(path);
+    return rsc_sptr;
 }
 
 template <class resource_type, class resource_manager_type>
@@ -46,9 +46,9 @@ requires requires(resource_type& value, const std::filesystem::path& fpath, reso
 }
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path, resource_manager_type &rsc_manager)
 {
-    resource_type value;
-    if (value.load_from_file(path, rsc_manager))
-        return std::make_shared<resource_type>(std::move(value));
+    if (std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
+        rsc_sptr->load_from_file(path,rsc_manager)) [[likely]]
+        return rsc_sptr;
     return std::shared_ptr<resource_type>();
 }
 
@@ -59,9 +59,9 @@ template <class resource_type, class resource_manager_type>
 }
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path, resource_manager_type &rsc_manager)
 {
-    resource_type value;
-    value.load_from_file(path, rsc_manager);
-    return std::make_shared<resource_type>(std::move(value));
+    std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
+    rsc_sptr->load_from_file(path, rsc_manager);
+    return rsc_sptr;
 }
 
 namespace concepts
