@@ -26,12 +26,77 @@ TEST(resource_manager_tests, get_shared__resource_file_exists__no_exception)
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
     text_sptr koro_sptr = rmanager.get_shared<text>(rsc/"koro.txt");
-    text_sptr koro_sptr_2 = rmanager.get_shared<text>(rsc/"koro.txt");
+    const std::filesystem::path rsc_path = rsc / "koro.txt";
+    text_sptr koro_sptr_2 = rmanager.get_shared<text>(rsc_path);
     ASSERT_NE(koro_sptr, nullptr);
     ASSERT_EQ(koro_sptr, koro_sptr_2);
     ASSERT_EQ(koro_sptr->contents, koro_contents());
 
     ASSERT_EQ(rmanager.number_of_resources<text>(), 1);
+}
+
+TEST(resource_manager_tests, get_shared__resource_file_does_not_exist__not_found_exception)
+{
+    std::filesystem::path rsc = rscdir();
+    rsce::basic_resource_manager rmanager;
+
+    try
+    {
+        text_sptr rsc_sptr = rmanager.get_shared<text>(rsc/"not_found.txt");
+        FAIL();
+    }
+    catch (const std::runtime_error&)
+    {
+        ASSERT_EQ(rmanager.number_of_resources<text>(), 0);
+    }
+}
+
+TEST(resource_manager_tests, get_shared__resource_file_does_not_exist_lvalue__not_found_exception)
+{
+    std::filesystem::path rsc = rscdir();
+    rsce::basic_resource_manager rmanager;
+
+    try
+    {
+        const std::filesystem::path rsc_path = rsc/"not_found.txt";
+        text_sptr rsc_sptr = rmanager.get_shared<text>(rsc_path);
+        FAIL();
+    }
+    catch (const std::runtime_error&)
+    {
+        ASSERT_EQ(rmanager.number_of_resources<text>(), 0);
+    }
+}
+
+TEST(resource_manager_tests, get_shared__resource_file_does_not_exist_nothrow__no_exception)
+{
+    std::filesystem::path rsc = rscdir();
+
+    rsce::basic_resource_manager rmanager;
+    text_sptr rsc_sptr = rmanager.get_shared<text>(rsc/"not_found.txt", std::nothrow);
+    ASSERT_EQ(rsc_sptr, nullptr);
+    const std::filesystem::path rsc_path = rsc/"not_found.txt";
+    rsc_sptr = rmanager.get_shared<text>(rsc_path, std::nothrow);
+    ASSERT_EQ(rsc_sptr, nullptr);
+}
+
+TEST(basic_resource_manager_tests, get_shared__resource_file_does_not_exist_nothrow__no_exception)
+{
+    std::filesystem::path rsc = rscdir();
+
+    try
+    {
+        rsce::basic_resource_manager rmanager;
+        text_sptr rsc_sptr = rmanager.get_shared<text>(rsc/"not_found.txt", std::nothrow);
+        ASSERT_EQ(rsc_sptr, nullptr);
+        const std::filesystem::path rsc_path = rsc/"not_found.txt";
+        rsc_sptr = rmanager.get_shared<text>(rsc_path, std::nothrow);
+        ASSERT_EQ(rsc_sptr, nullptr);
+    }
+    catch (...)
+    {
+        FAIL();
+    }
 }
 
 TEST(resource_manager_tests, get__resource_file_exists__no_exception)
@@ -84,7 +149,8 @@ TEST(resource_manager_tests, load__resource_file_exists__expect_no_exception)
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
     text_sptr koro_sptr = rmanager.load<text>(rsc/"koro.txt");
-    text_sptr tiki_sptr = rmanager.load<text>(rsc/"tiki.txt");
+    const std::filesystem::path rsc_path = rsc / "tiki.txt";
+    text_sptr tiki_sptr = rmanager.load<text>(rsc_path);
     ASSERT_EQ(rmanager.number_of_resources<text>(), 2);
     text_sptr koro_2_sptr = rmanager.load<text>(rsc/"koro.txt");
     ASSERT_EQ(rmanager.number_of_resources<text>(), 2);
@@ -103,7 +169,8 @@ TEST(resource_manager_tests, remove__rsc_path__no_error)
     ASSERT_EQ(rmanager.number_of_resources<text>(), 2);
     rmanager.remove<text>(rsc/"koro.txt");
     ASSERT_EQ(rmanager.number_of_resources<text>(), 1);
-    rmanager.remove<text>(rsc/"tiki.txt");
+    const std::filesystem::path rsc_path = rsc / "tiki.txt";
+    rmanager.remove<text>(rsc_path);
     ASSERT_EQ(rmanager.number_of_resources<text>(), 0);
 }
 
@@ -114,7 +181,8 @@ TEST(resource_manager_tests, get_shared__vlfs_resource_file_exists__no_exception
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
     text_sptr koro_sptr = rmanager.get_shared<text>("RSC:/koro.txt");
-    text_sptr koro_sptr_2 = rmanager.get_shared<text>("RSC:/koro.txt");
+    const std::filesystem::path rsc_path = "RSC:/koro.txt";
+    text_sptr koro_sptr_2 = rmanager.get_shared<text>(rsc_path);
     ASSERT_NE(koro_sptr, nullptr);
     ASSERT_EQ(koro_sptr, koro_sptr_2);
     ASSERT_EQ(koro_sptr->contents, koro_contents());
@@ -172,7 +240,8 @@ TEST(resource_manager_tests, load__vlfs_resource_file_exists__expect_no_exceptio
     vlfs::virtual_filesystem vlfs = create_vlfs();
     rsce::resource_manager rmanager(vlfs);
     text_sptr koro_sptr = rmanager.load<text>("RSC:/koro.txt");
-    text_sptr tiki_sptr = rmanager.load<text>("RSC:/tiki.txt");
+    const std::filesystem::path rsc_path = "RSC:/tiki.txt";
+    text_sptr tiki_sptr = rmanager.load<text>(rsc_path);
     ASSERT_EQ(rmanager.number_of_resources<text>(), 2);
     text_sptr koro_2_sptr = rmanager.load<text>("RSC:/koro.txt", std::nothrow);
     ASSERT_EQ(rmanager.number_of_resources<text>(), 2);
@@ -193,7 +262,8 @@ TEST(resource_manager_tests, remove__vlfs_rsc_path__no_error)
     ASSERT_EQ(rmanager.number_of_resources<text>(), 2);
     rmanager.remove<text>("RSC:/koro.txt");
     ASSERT_EQ(rmanager.number_of_resources<text>(), 1);
-    rmanager.remove<text>("RSC:/tiki.txt");
+    const std::filesystem::path rsc_path = "RSC:/tiki.txt";
+    rmanager.remove<text>(rsc_path);
     ASSERT_EQ(rmanager.number_of_resources<text>(), 0);
 }
 
