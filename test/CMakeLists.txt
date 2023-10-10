@@ -17,3 +17,5 @@ add_cpp_library_basic_tests(GTest::gtest
         resource_manager_tests.cpp
         resource_manager_mngr_tests.cpp
 )
+
+add_subdirectory(plugin_tests)
