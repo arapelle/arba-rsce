@@ -60,7 +60,7 @@ add_cpp_library(
 
 ## Link C++ targets:
 if(NOT TARGET arba-core)
-    find_package(arba-core 0.18.0 REQUIRED CONFIG)
+    find_package(arba-core 0.20.0 REQUIRED CONFIG)
 endif()
 if(NOT TARGET arba-vlfs)
     find_package(arba-vlfs 0.3.0 REQUIRED CONFIG)
