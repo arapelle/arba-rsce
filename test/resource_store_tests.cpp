@@ -5,10 +5,18 @@
 #include "resources/text_mngr.hpp"
 #include "resources/story.hpp"
 #include "resources/story_mngr.hpp"
+#include "resources/stream_text_rsc.hpp"
+#include "resources/stream_text_rsc_mngr.hpp"
+#include "resources/stream_binary_rsc.hpp"
+#include "resources/stream_binary_rsc_mngr.hpp"
 #include "resources/resources_helper.hpp"
 
 static_assert(rsce::traits::is_loadable_resource_v<text>);
 static_assert(rsce::traits::is_loadable_resource_v<text_mngr, rsce::basic_resource_manager>);
+static_assert(rsce::traits::is_loadable_resource_v<stream_text_rsc>);
+static_assert(rsce::traits::is_loadable_resource_v<stream_text_rsc_mngr, rsce::basic_resource_manager>);
+static_assert(rsce::traits::is_loadable_resource_v<stream_binary_rsc>);
+static_assert(rsce::traits::is_loadable_resource_v<stream_binary_rsc_mngr, rsce::basic_resource_manager>);
 
 using text_sptr = rsce::resource_store<text>::resource_sptr;
 using text_mngr_sptr = rsce::resource_store<text_mngr>::resource_sptr;
@@ -16,6 +24,9 @@ using text_mngr_sptr = rsce::resource_store<text_mngr>::resource_sptr;
 namespace rsce
 {
 template class default_resource_store<text>;
+template class default_resource_store<story>;
+template class default_resource_store<stream_text_rsc>;
+template class default_resource_store<stream_binary_rsc>;
 }
 
 // Unit tests:
@@ -38,12 +49,101 @@ TEST(resource_store_tests, get_shared__resource_file_exists__no_exception)
         ASSERT_NE(koro_sptr, nullptr);
         ASSERT_EQ(koro_sptr, koro_sptr_2);
         ASSERT_EQ(koro_sptr->contents, koro_contents());
-
         ASSERT_EQ(text_store.size(), 1);
     }
     catch (...)
     {
         FAIL();
+    }
+}
+
+TEST(resource_store_tests, get_shared__stream_text_rsc_file_exists__no_exception)
+{
+    std::filesystem::path rsc = rscdir();
+
+    try
+    {
+        rsce::resource_store<stream_text_rsc> text_store;
+        std::shared_ptr koro_sptr = text_store.get_shared(rsc/"koro.txt");
+        ASSERT_EQ(koro_sptr->contents, koro_contents());
+        ASSERT_EQ(text_store.size(), 1);
+
+        rsce::resource_store<throw_stream_text_rsc> throw_text_store;
+        std::shared_ptr tiki_sptr = throw_text_store.get_shared(rsc/"tiki.txt");
+        ASSERT_EQ(tiki_sptr->contents, tiki_contents());
+        ASSERT_EQ(throw_text_store.size(), 1);
+    }
+    catch (...)
+    {
+        throw;
+    }
+}
+
+TEST(resource_store_tests, get_shared__stream_binary_rsc_file_exists__no_exception)
+{
+    std::filesystem::path rsc = rscdir();
+
+    try
+    {
+        rsce::resource_store<stream_binary_rsc> text_store;
+        std::shared_ptr tiki_sptr = text_store.get_shared(rsc/"tiki.txt");
+        ASSERT_EQ(tiki_sptr->contents, tiki_contents());
+        ASSERT_EQ(text_store.size(), 1);
+
+        rsce::resource_store<throw_stream_binary_rsc> throw_text_store;
+        std::shared_ptr tiki_sptr_2 = throw_text_store.get_shared(rsc/"tiki.txt");
+        ASSERT_EQ(tiki_sptr_2->contents, tiki_contents());
+        ASSERT_EQ(throw_text_store.size(), 1);
+    }
+    catch (...)
+    {
+        throw;
+    }
+}
+
+TEST(resource_store_tests, get_shared__stream_text_rsc_mngr_file_exists__no_exception)
+{
+    std::filesystem::path rsc = rscdir();
+    rsce::basic_resource_manager rmanager;
+
+    try
+    {
+        rsce::resource_store<stream_text_rsc_mngr> text_store;
+        std::shared_ptr koro_sptr = text_store.get_shared(rsc/"koro.txt", rmanager);
+        ASSERT_EQ(koro_sptr->contents, koro_contents());
+        ASSERT_EQ(text_store.size(), 1);
+
+        rsce::resource_store<throw_stream_text_rsc_mngr> throw_text_store;
+        std::shared_ptr tiki_sptr = throw_text_store.get_shared(rsc/"tiki.txt", rmanager);
+        ASSERT_EQ(tiki_sptr->contents, tiki_contents());
+        ASSERT_EQ(throw_text_store.size(), 1);
+    }
+    catch (...)
+    {
+        throw;
+    }
+}
+
+TEST(resource_store_tests, get_shared__stream_binary_rsc_mngr_file_exists__no_exception)
+{
+    std::filesystem::path rsc = rscdir();
+    rsce::basic_resource_manager rmanager;
+
+    try
+    {
+        rsce::resource_store<stream_binary_rsc_mngr> text_store;
+        std::shared_ptr tiki_sptr = text_store.get_shared(rsc/"tiki.txt", rmanager);
+        ASSERT_EQ(tiki_sptr->contents, tiki_contents());
+        ASSERT_EQ(text_store.size(), 1);
+
+        rsce::resource_store<throw_stream_binary_rsc_mngr> throw_text_store;
+        std::shared_ptr tiki_sptr_2 = throw_text_store.get_shared(rsc/"tiki.txt", rmanager);
+        ASSERT_EQ(tiki_sptr_2->contents, tiki_contents());
+        ASSERT_EQ(throw_text_store.size(), 1);
+    }
+    catch (...)
+    {
+        throw;
     }
 }
 
