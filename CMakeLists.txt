@@ -34,7 +34,9 @@ generate_version_macro_header(generated_version_header
 
 ## Headers:
 set(headers
+    include/arba/rsce/load_resource_from_binary_stream.hpp
     include/arba/rsce/load_resource_from_file.hpp
+    include/arba/rsce/load_resource_from_text_stream.hpp
     include/arba/rsce/resource_store.hpp
     include/arba/rsce/basic_resource_manager.hpp
     include/arba/rsce/resource_manager.hpp

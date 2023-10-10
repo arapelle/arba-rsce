@@ -1,12 +1,17 @@
 #pragma once
 
 #include <filesystem>
+#include <fstream>
 #include <memory>
+#include "load_resource_from_binary_stream.hpp"
+#include "load_resource_from_text_stream.hpp"
 
 inline namespace arba
 {
 namespace rsce
 {
+
+// load_resource_from_file(path);
 
 template <class resource_type>
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path) = delete;
@@ -16,6 +21,14 @@ requires requires(resource_type& value, const std::filesystem::path& fpath)
 {
     { value.load_from_file(fpath) } -> std::convertible_to<bool>;
 }
+&& (!requires(std::istream& stream)
+{
+    { load_resource_from_binary_stream<resource_type>(stream) };
+})
+&& (!requires(std::istream& stream)
+{
+    { load_resource_from_text_stream<resource_type>(stream) };
+})
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path)
 {
     if (std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
@@ -29,12 +42,46 @@ template <class resource_type>
 {
     { value.load_from_file(fpath) } -> std::same_as<void>;
 }
+&& (!requires(std::istream& stream)
+{
+    { load_resource_from_binary_stream<resource_type>(stream) };
+})
+&& (!requires(std::istream& stream)
+{
+    { load_resource_from_text_stream<resource_type>(stream) };
+})
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path)
 {
     std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
     rsc_sptr->load_from_file(path);
     return rsc_sptr;
 }
+
+template <class resource_type>
+requires requires(std::istream& stream)
+{
+    { load_resource_from_binary_stream<resource_type>(stream) } -> std::same_as<std::shared_ptr<resource_type>>;
+}
+std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path)
+{
+    std::ifstream stream(path, std::ifstream::binary);
+    stream.exceptions(std::ifstream::failbit);
+    return load_resource_from_binary_stream<resource_type>(stream);
+}
+
+template <class resource_type>
+    requires requires(std::istream& stream)
+{
+    { load_resource_from_text_stream<resource_type>(stream) } -> std::same_as<std::shared_ptr<resource_type>>;
+}
+std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path)
+{
+    std::ifstream stream(path);
+    stream.exceptions(std::ifstream::failbit);
+    return load_resource_from_text_stream<resource_type>(stream);
+}
+
+// load_resource_from_file(path, resource_manager);
 
 template <class resource_type, class resource_manager_type>
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path, resource_manager_type& rsc_manager) = delete;
@@ -44,6 +91,14 @@ requires requires(resource_type& value, const std::filesystem::path& fpath, reso
 {
     { value.load_from_file(fpath, rsc_manager) } -> std::convertible_to<bool>;
 }
+&& (!requires(std::istream& stream, resource_manager_type& rsc_manager)
+{
+    { load_resource_from_binary_stream<resource_type>(stream, rsc_manager) };
+})
+&& (!requires(std::istream& stream, resource_manager_type& rsc_manager)
+{
+    { load_resource_from_text_stream<resource_type>(stream, rsc_manager) };
+})
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path, resource_manager_type &rsc_manager)
 {
     if (std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
@@ -57,11 +112,43 @@ template <class resource_type, class resource_manager_type>
 {
     { value.load_from_file(fpath, rsc_manager) } -> std::same_as<void>;
 }
+&& (!requires(std::istream& stream, resource_manager_type& rsc_manager)
+{
+    { load_resource_from_binary_stream<resource_type>(stream, rsc_manager) };
+})
+&& (!requires(std::istream& stream, resource_manager_type& rsc_manager)
+{
+    { load_resource_from_text_stream<resource_type>(stream, rsc_manager) };
+})
 std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path, resource_manager_type &rsc_manager)
 {
     std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
     rsc_sptr->load_from_file(path, rsc_manager);
     return rsc_sptr;
+}
+
+template <class resource_type, class resource_manager_type>
+    requires requires(std::istream& stream, resource_manager_type& rsc_manager)
+{
+    { load_resource_from_binary_stream<resource_type>(stream, rsc_manager) } -> std::same_as<std::shared_ptr<resource_type>>;
+}
+std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path, resource_manager_type &rsc_manager)
+{
+    std::ifstream stream(path, std::ifstream::binary);
+    stream.exceptions(std::ifstream::failbit);
+    return load_resource_from_binary_stream<resource_type>(stream, rsc_manager);
+}
+
+template <class resource_type, class resource_manager_type>
+    requires requires(std::istream& stream, resource_manager_type& rsc_manager)
+{
+    { load_resource_from_text_stream<resource_type>(stream, rsc_manager) } -> std::same_as<std::shared_ptr<resource_type>>;
+}
+std::shared_ptr<resource_type> load_resource_from_file(const std::filesystem::path& path, resource_manager_type &rsc_manager)
+{
+    std::ifstream stream(path);
+    stream.exceptions(std::ifstream::failbit);
+    return load_resource_from_text_stream<resource_type>(stream, rsc_manager);
 }
 
 namespace concepts
