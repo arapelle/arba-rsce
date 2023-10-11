@@ -1,0 +1,5 @@
+add_library(${project_base_name}_rng SHARED rng.cpp)
+target_compile_features(${project_base_name}_rng PUBLIC cxx_std_20)
+target_link_libraries(${project_base_name}_rng PUBLIC ${project_base_name}_rng_interface)
+set_property(TARGET ${project_base_name}_rng PROPERTY POSITION_INDEPENDENT_CODE 1)
+set_target_properties(${project_base_name}_rng PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

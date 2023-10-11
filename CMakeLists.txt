@@ -16,7 +16,7 @@ set_build_type_ifndef()
 set(PROJECT_NAME "arba-rsce")
 set(project_namespace "arba")
 set(project_base_name "rsce")
-set(PROJECT_VERSION 0.2.0)
+set(PROJECT_VERSION 0.3.0)
 project(${PROJECT_NAME}
         VERSION ${PROJECT_VERSION}
         DESCRIPTION "A C++ library providing tools for managing resources."
@@ -34,7 +34,9 @@ generate_version_macro_header(generated_version_header
 
 ## Headers:
 set(headers
+    include/arba/rsce/load_resource_from_binary_stream.hpp
     include/arba/rsce/load_resource_from_file.hpp
+    include/arba/rsce/load_resource_from_text_stream.hpp
     include/arba/rsce/resource_store.hpp
     include/arba/rsce/basic_resource_manager.hpp
     include/arba/rsce/resource_manager.hpp
@@ -57,13 +59,16 @@ add_cpp_library(
 )
 
 ## Link C++ targets:
+if(NOT TARGET arba-core)
+    find_package(arba-core 0.20.0 REQUIRED CONFIG)
+endif()
 if(NOT TARGET arba-vlfs)
-    find_package(arba-vlfs 0.2.0 REQUIRED CONFIG)
+    find_package(arba-vlfs 0.3.0 REQUIRED CONFIG)
 endif()
 cpp_library_link_libraries(
     SHARED ${PROJECT_NAME}
     STATIC ${PROJECT_NAME}-static
-    PUBLIC arba-vlfs
+    PUBLIC arba-core arba-vlfs
 )
 
 ## Install C++ library:
@@ -85,7 +90,6 @@ endif()
 
 ## Add tests:
 option_or_set_ifdef(BUILD_${PROJECT_NAME}_TESTS "Build ${PROJECT_NAME} tests or not" OFF BUILD_arba-arba_TESTS)
-option(BUILD_${PROJECT_NAME}_TESTS "Build ${PROJECT_NAME} tests or not" OFF)
 if(BUILD_${PROJECT_NAME}_TESTS AND BUILD_TESTING)
     add_subdirectory(test)
 endif()
