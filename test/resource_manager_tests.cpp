@@ -174,7 +174,9 @@ TEST(resource_manager_tests, load__vlfs_resource_file_exists__expect_no_exceptio
     text_sptr koro_sptr = rmanager.load<text>("RSC:/koro.txt");
     text_sptr tiki_sptr = rmanager.load<text>("RSC:/tiki.txt");
     ASSERT_EQ(rmanager.number_of_resources<text>(), 2);
-    text_sptr koro_2_sptr = rmanager.load<text>("RSC:/koro.txt");
+    text_sptr koro_2_sptr = rmanager.load<text>("RSC:/koro.txt", std::nothrow);
+    ASSERT_EQ(rmanager.number_of_resources<text>(), 2);
+    text_sptr tiki_2_sptr = rmanager.load<text>(rsc_path, std::nothrow);
     ASSERT_EQ(rmanager.number_of_resources<text>(), 2);
     ASSERT_NE(koro_sptr, koro_2_sptr);
     ASSERT_EQ(koro_sptr->contents, koro_2_sptr->contents);
