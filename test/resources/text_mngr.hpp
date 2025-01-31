@@ -21,8 +21,8 @@ public:
         contents.reserve(stream.tellg());
         stream.seekg(0, std::ios::beg);
         contents.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-        return contents[0] >= 'a' && contents[0] <= 'z'
-               || contents[0] >= 'A' && contents[0] <= 'Z';
+        return (contents[0] >= 'a' && contents[0] <= 'z')
+               || (contents[0] >= 'A' && contents[0] <= 'Z');
     }
 };
 

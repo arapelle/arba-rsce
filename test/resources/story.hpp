@@ -21,8 +21,8 @@ public:
         contents.reserve(stream.tellg());
         stream.seekg(0, std::ios::beg);
         contents.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-        if (!(contents[0] >= 'a' && contents[0] <= 'z'
-              || contents[0] >= 'A' && contents[0] <= 'Z'))
+        if (!((contents[0] >= 'a' && contents[0] <= 'z')
+              || (contents[0] >= 'A' && contents[0] <= 'Z')))
         {
             std::string err_msg = std::format("Problem to load \"{}\" as an input stream.", fpath.generic_string());
             throw std::runtime_error(err_msg);

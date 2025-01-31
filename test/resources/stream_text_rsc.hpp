@@ -19,8 +19,8 @@ public:
         contents.reserve(stream.tellg());
         stream.seekg(0, std::ios::beg);
         contents.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-        return contents[0] >= 'a' && contents[0] <= 'z'
-            || contents[0] >= 'A' && contents[0] <= 'Z';
+        return (contents[0] >= 'a' && contents[0] <= 'z')
+               || (contents[0] >= 'A' && contents[0] <= 'Z');
     }
 
     bool load_from_file(const std::filesystem::path&)
@@ -47,8 +47,8 @@ public:
         contents.reserve(stream.tellg());
         stream.seekg(0, std::ios::beg);
         contents.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-        if (!(contents[0] >= 'a' && contents[0] <= 'z'
-              || contents[0] >= 'A' && contents[0] <= 'Z'))
+        if (!((contents[0] >= 'a' && contents[0] <= 'z')
+              || (contents[0] >= 'A' && contents[0] <= 'Z')))
         {
             throw std::runtime_error("Problem to load.");
         }

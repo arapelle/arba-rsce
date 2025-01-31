@@ -1,7 +1,6 @@
 #pragma once
 
 #include "load_resource_from_file.hpp"
-#include <arba/core/debug/assert.hpp>
 #include <unordered_map>
 #include <filesystem>
 #include <functional>
@@ -9,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <concepts>
+#include <cassert>
 
 inline namespace arba
 {
@@ -182,7 +182,7 @@ default_resource_store<resource_type>::emplace_if_valid_(const std::filesystem::
 template <class resource_type>
 bool default_resource_store<resource_type>::insert(const std::filesystem::path &rsc_path, resource_sptr resource)
 {
-    ARBA_ASSERT(resource);
+    assert(resource);
     std::lock_guard lock(mutex_);
     return resources_.insert(typename resource_dico::value_type(rsc_path, std::move(resource))).second;
 }
@@ -190,7 +190,7 @@ bool default_resource_store<resource_type>::insert(const std::filesystem::path &
 template <class resource_type>
 void default_resource_store<resource_type>::set(const std::filesystem::path &rsc_path, resource_sptr resource)
 {
-    ARBA_ASSERT(resource);
+    assert(resource);
     std::lock_guard lock(mutex_);
     resources_[rsc_path] = std::move(resource);
 }
