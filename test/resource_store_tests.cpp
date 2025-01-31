@@ -40,7 +40,7 @@ TEST(resource_store_tests, constructor__no_arg__no_error)
 
 TEST(resource_store_tests, get_shared__resource_file_exists__no_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
 
     try
     {
@@ -60,7 +60,7 @@ TEST(resource_store_tests, get_shared__resource_file_exists__no_exception)
 
 TEST(resource_store_tests, get_shared__stream_text_rsc_file_exists__no_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
 
     try
     {
@@ -82,7 +82,7 @@ TEST(resource_store_tests, get_shared__stream_text_rsc_file_exists__no_exception
 
 TEST(resource_store_tests, get_shared__stream_binary_rsc_file_exists__no_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
 
     try
     {
@@ -104,7 +104,7 @@ TEST(resource_store_tests, get_shared__stream_binary_rsc_file_exists__no_excepti
 
 TEST(resource_store_tests, get_shared__stream_text_rsc_mngr_file_exists__no_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
     rsce::basic_resource_manager rmanager;
 
     try
@@ -127,7 +127,7 @@ TEST(resource_store_tests, get_shared__stream_text_rsc_mngr_file_exists__no_exce
 
 TEST(resource_store_tests, get_shared__stream_binary_rsc_mngr_file_exists__no_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
     rsce::basic_resource_manager rmanager;
 
     try
@@ -150,7 +150,7 @@ TEST(resource_store_tests, get_shared__stream_binary_rsc_mngr_file_exists__no_ex
 
 TEST(resource_store_tests, get_shared__invalid_resource_file_exists__no_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
 
     rsce::resource_store<story> story_store;
     try
@@ -165,7 +165,7 @@ TEST(resource_store_tests, get_shared__invalid_resource_file_exists__no_exceptio
 
 TEST(resource_store_tests, get_shared__resource_file_does_not_exist__not_found_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
 
     rsce::resource_store<text> text_store;
     try
@@ -181,7 +181,7 @@ TEST(resource_store_tests, get_shared__resource_file_does_not_exist__not_found_e
 
 TEST(resource_store_tests, get_shared__resource_mngr_file_exists__no_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
     rsce::basic_resource_manager rmanager;
 
     try
@@ -203,7 +203,7 @@ TEST(resource_store_tests, get_shared__resource_mngr_file_exists__no_exception)
 
 TEST(resource_store_tests, get_shared__invalid_resource_mngr_file_exists__no_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
     rsce::basic_resource_manager rmanager;
 
     rsce::resource_store<story_mngr> story_store;
@@ -219,7 +219,7 @@ TEST(resource_store_tests, get_shared__invalid_resource_mngr_file_exists__no_exc
 
 TEST(resource_store_tests, get_shared__resource_mngr_file_does_not_exist__not_found_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
     rsce::basic_resource_manager rmanager;
 
     rsce::resource_store<text_mngr> text_store;
@@ -236,7 +236,7 @@ TEST(resource_store_tests, get_shared__resource_mngr_file_does_not_exist__not_fo
 
 TEST(resource_store_tests, load__resource_file_exists__expect_no_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
     rsce::resource_store<text> text_store;
 
     try
@@ -257,7 +257,7 @@ TEST(resource_store_tests, load__resource_file_exists__expect_no_exception)
 
 TEST(resource_store_tests, load__resource_file_does_not_exist__not_found_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
     rsce::resource_store<text> text_store;
 
     try
@@ -273,7 +273,7 @@ TEST(resource_store_tests, load__resource_file_does_not_exist__not_found_excepti
 
 TEST(resource_store_tests, load__resource_mngr_file_exists__expect_no_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
     rsce::basic_resource_manager rmanager;
     rsce::resource_store<text_mngr> text_store;
 
@@ -295,7 +295,7 @@ TEST(resource_store_tests, load__resource_mngr_file_exists__expect_no_exception)
 
 TEST(resource_store_tests, load__resource_mngr_file_does_not_exist__not_found_exception)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
     rsce::basic_resource_manager rmanager;
     rsce::resource_store<text_mngr> text_store;
 
@@ -312,7 +312,7 @@ TEST(resource_store_tests, load__resource_mngr_file_does_not_exist__not_found_ex
 
 TEST(resource_store_tests, clear__no_arg__no_error)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
 
     rsce::resource_store<text> text_store;
     text_store.get_shared(rsc / "koro.txt");
@@ -352,7 +352,7 @@ TEST(resource_store_tests, set__rsc_sptr__no_error)
 
 TEST(resource_store_tests, remove__rsc_path__no_error)
 {
-    std::filesystem::path rsc = rscdir();
+    std::filesystem::path rsc = textdir();
 
     rsce::resource_store<text> text_store;
     text_sptr koro_sptr = text_store.load(rsc / "koro.txt");
@@ -362,11 +362,4 @@ TEST(resource_store_tests, remove__rsc_path__no_error)
     ASSERT_EQ(text_store.size(), 1);
     text_store.remove(rsc / "tiki.txt");
     ASSERT_EQ(text_store.size(), 0);
-}
-
-int main(int argc, char** argv)
-{
-    create_resource_files();
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
