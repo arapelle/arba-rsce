@@ -16,7 +16,7 @@ set_build_type_ifndef()
 set(PROJECT_NAME "arba-rsce")
 set(project_namespace "arba")
 set(project_base_name "rsce")
-set(PROJECT_VERSION 0.3.0)
+set(PROJECT_VERSION 0.4.0)
 project(${PROJECT_NAME}
         VERSION ${PROJECT_VERSION}
         DESCRIPTION "A C++ library providing tools for managing resources."
