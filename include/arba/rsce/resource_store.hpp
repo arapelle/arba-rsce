@@ -1,14 +1,15 @@
 #pragma once
 
 #include "load_resource_from_file.hpp"
-#include <unordered_map>
+
+#include <cassert>
+#include <concepts>
 #include <filesystem>
-#include <functional>
 #include <format>
+#include <functional>
 #include <memory>
 #include <mutex>
-#include <concepts>
-#include <cassert>
+#include <unordered_map>
 
 inline namespace arba
 {
@@ -46,8 +47,8 @@ public:
     virtual ~default_resource_store() override = default;
 
     inline std::size_t size() { return resources_.size(); }
-    inline void        clear() { resources_.clear(); }
-    inline void        reserve(std::size_t capacity) { resources_.reserve(capacity); }
+    inline void clear() { resources_.clear(); }
+    inline void reserve(std::size_t capacity) { resources_.reserve(capacity); }
 
     template <class resource_manager_type>
     resource_sptr get_shared(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
@@ -78,7 +79,8 @@ private:
 template <class resource_type>
 template <class resource_manager_type>
 default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::get_shared(const std::filesystem::path &rsc_path, resource_manager_type& rsc_manager)
+default_resource_store<resource_type>::get_shared(const std::filesystem::path& rsc_path,
+                                                  resource_manager_type& rsc_manager)
 {
     std::lock_guard lock(mutex_);
 
@@ -103,7 +105,7 @@ default_resource_store<resource_type>::get_shared(const std::filesystem::path &r
 
 template <class resource_type>
 default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::get_shared(const std::filesystem::path &rsc_path)
+default_resource_store<resource_type>::get_shared(const std::filesystem::path& rsc_path)
 {
     std::lock_guard lock(mutex_);
 
@@ -122,7 +124,7 @@ default_resource_store<resource_type>::get_shared(const std::filesystem::path &r
 template <class resource_type>
 template <class resource_manager_type>
 default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path, resource_manager_type& rsc_manager)
+default_resource_store<resource_type>::load(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager)
 {
     std::filesystem::path c_rsc_path = std::filesystem::canonical(rsc_path);
     if constexpr (traits::is_loadable_resource_v<resource_type, resource_manager_type>)
@@ -137,7 +139,7 @@ default_resource_store<resource_type>::load(const std::filesystem::path &rsc_pat
 
 template <class resource_type>
 default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::load(const std::filesystem::path &rsc_path)
+default_resource_store<resource_type>::load(const std::filesystem::path& rsc_path)
 {
     std::filesystem::path c_rsc_path = std::filesystem::canonical(rsc_path);
     return load_canonical_(c_rsc_path);
@@ -145,7 +147,7 @@ default_resource_store<resource_type>::load(const std::filesystem::path &rsc_pat
 
 template <class resource_type>
 default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::load_canonical_(const std::filesystem::path &c_rsc_path)
+default_resource_store<resource_type>::load_canonical_(const std::filesystem::path& c_rsc_path)
 {
     resource_sptr rsc_sptr = load_resource_from_file<resource_type>(c_rsc_path);
     return emplace_if_valid_(c_rsc_path, std::move(rsc_sptr));
@@ -155,7 +157,8 @@ template <class resource_type>
 template <class resource_manager_type>
     requires traits::is_loadable_resource_v<resource_type, resource_manager_type>
 default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::load_canonical_(const std::filesystem::path &c_rsc_path, resource_manager_type& rsc_manager)
+default_resource_store<resource_type>::load_canonical_(const std::filesystem::path& c_rsc_path,
+                                                       resource_manager_type& rsc_manager)
 {
     resource_sptr rsc_sptr = load_resource_from_file<resource_type>(c_rsc_path, rsc_manager);
     return emplace_if_valid_(c_rsc_path, std::move(rsc_sptr));
@@ -163,7 +166,8 @@ default_resource_store<resource_type>::load_canonical_(const std::filesystem::pa
 
 template <class resource_type>
 default_resource_store<resource_type>::resource_sptr
-default_resource_store<resource_type>::emplace_if_valid_(const std::filesystem::path& c_rsc_path, resource_sptr rsc_sptr)
+default_resource_store<resource_type>::emplace_if_valid_(const std::filesystem::path& c_rsc_path,
+                                                         resource_sptr rsc_sptr)
 {
     if (rsc_sptr) [[likely]]
     {
@@ -180,7 +184,7 @@ default_resource_store<resource_type>::emplace_if_valid_(const std::filesystem::
 }
 
 template <class resource_type>
-bool default_resource_store<resource_type>::insert(const std::filesystem::path &rsc_path, resource_sptr resource)
+bool default_resource_store<resource_type>::insert(const std::filesystem::path& rsc_path, resource_sptr resource)
 {
     assert(resource);
     std::lock_guard lock(mutex_);
@@ -188,7 +192,7 @@ bool default_resource_store<resource_type>::insert(const std::filesystem::path &
 }
 
 template <class resource_type>
-void default_resource_store<resource_type>::set(const std::filesystem::path &rsc_path, resource_sptr resource)
+void default_resource_store<resource_type>::set(const std::filesystem::path& rsc_path, resource_sptr resource)
 {
     assert(resource);
     std::lock_guard lock(mutex_);
@@ -209,5 +213,5 @@ public:
     using default_resource_store<resource_type>::default_resource_store;
 };
 
-}
-}
+} // namespace rsce
+} // namespace arba

@@ -1,9 +1,10 @@
 #pragma once
 
 #include "resource_store.hpp"
+
+#include <atomic>
 #include <shared_mutex>
 #include <typeinfo>
-#include <atomic>
 
 inline namespace arba
 {
@@ -108,8 +109,8 @@ protected:
     template <class resource>
     inline void throw_resource_store_is_missing_()
     {
-        std::string err_str = std::format("No resource of this type is stored in this manager. Resource: {}",
-                                          typeid(resource).name());
+        std::string err_str =
+            std::format("No resource of this type is stored in this manager. Resource: {}", typeid(resource).name());
         throw std::invalid_argument(err_str);
     }
 
@@ -159,5 +160,5 @@ private:
     mutable std::shared_mutex mutex_;
 };
 
-}
-}
+} // namespace rsce
+} // namespace arba

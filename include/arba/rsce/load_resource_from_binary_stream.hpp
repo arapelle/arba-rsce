@@ -12,23 +12,21 @@ template <class resource_type>
 std::shared_ptr<resource_type> load_resource_from_binary_stream(std::istream& stream) = delete;
 
 template <class resource_type>
-requires requires(resource_type& value, std::istream& stream)
-{
-    { value.load_from_binary_stream(stream) } -> std::convertible_to<bool>;
-}
+    requires requires(resource_type& value, std::istream& stream) {
+        { value.load_from_binary_stream(stream) } -> std::convertible_to<bool>;
+    }
 std::shared_ptr<resource_type> load_resource_from_binary_stream(std::istream& stream)
 {
-    if (std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
-        rsc_sptr->load_from_binary_stream(stream)) [[likely]]
+    if (std::shared_ptr rsc_sptr = std::make_shared<resource_type>(); rsc_sptr->load_from_binary_stream(stream))
+        [[likely]]
         return rsc_sptr;
     return std::shared_ptr<resource_type>();
 }
 
 template <class resource_type>
-    requires requires(resource_type& value, std::istream& stream)
-{
-    { value.load_from_binary_stream(stream) } -> std::same_as<void>;
-}
+    requires requires(resource_type& value, std::istream& stream) {
+        { value.load_from_binary_stream(stream) } -> std::same_as<void>;
+    }
 std::shared_ptr<resource_type> load_resource_from_binary_stream(std::istream& stream)
 {
     std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
@@ -37,14 +35,15 @@ std::shared_ptr<resource_type> load_resource_from_binary_stream(std::istream& st
 }
 
 template <class resource_type, class resource_manager_type>
-std::shared_ptr<resource_type> load_resource_from_binary_stream(std::istream& stream, resource_manager_type& rsc_manager) = delete;
+std::shared_ptr<resource_type> load_resource_from_binary_stream(std::istream& stream,
+                                                                resource_manager_type& rsc_manager) = delete;
 
 template <class resource_type, class resource_manager_type>
-requires requires(resource_type& value, std::istream& stream, resource_manager_type& rsc_manager)
-{
-    { value.load_from_binary_stream(stream, rsc_manager) } -> std::convertible_to<bool>;
-}
-std::shared_ptr<resource_type> load_resource_from_binary_stream(std::istream& stream, resource_manager_type &rsc_manager)
+    requires requires(resource_type& value, std::istream& stream, resource_manager_type& rsc_manager) {
+        { value.load_from_binary_stream(stream, rsc_manager) } -> std::convertible_to<bool>;
+    }
+std::shared_ptr<resource_type> load_resource_from_binary_stream(std::istream& stream,
+                                                                resource_manager_type& rsc_manager)
 {
     if (std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
         rsc_sptr->load_from_binary_stream(stream, rsc_manager)) [[likely]]
@@ -53,16 +52,16 @@ std::shared_ptr<resource_type> load_resource_from_binary_stream(std::istream& st
 }
 
 template <class resource_type, class resource_manager_type>
-    requires requires(resource_type& value, std::istream& stream, resource_manager_type& rsc_manager)
-{
-    { value.load_from_binary_stream(stream, rsc_manager) } -> std::same_as<void>;
-}
-std::shared_ptr<resource_type> load_resource_from_binary_stream(std::istream& stream, resource_manager_type &rsc_manager)
+    requires requires(resource_type& value, std::istream& stream, resource_manager_type& rsc_manager) {
+        { value.load_from_binary_stream(stream, rsc_manager) } -> std::same_as<void>;
+    }
+std::shared_ptr<resource_type> load_resource_from_binary_stream(std::istream& stream,
+                                                                resource_manager_type& rsc_manager)
 {
     std::shared_ptr rsc_sptr = std::make_shared<resource_type>();
     rsc_sptr->load_from_binary_stream(stream, rsc_manager);
     return rsc_sptr;
 }
 
-}
-}
+} // namespace rsce
+} // namespace arba

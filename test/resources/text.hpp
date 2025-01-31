@@ -1,11 +1,12 @@
 #pragma once
 
-#include <string>
-#include <fstream>
-#include <filesystem>
-#include <stdexcept>
-#include <format>
 #include <arba/rsce/basic_resource_manager.hpp>
+
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <stdexcept>
+#include <string>
 
 class text
 {
@@ -21,12 +22,12 @@ public:
         contents.reserve(stream.tellg());
         stream.seekg(0, std::ios::beg);
         contents.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-        return (contents[0] >= 'a' && contents[0] <= 'z')
-               || (contents[0] >= 'A' && contents[0] <= 'Z');
+        return (contents[0] >= 'a' && contents[0] <= 'z') || (contents[0] >= 'A' && contents[0] <= 'Z');
     }
 };
 
-template<> struct std::hash<text>
+template <>
+struct std::hash<text>
 {
     std::size_t operator()(text const& value) const noexcept { return std::hash<std::string>{}(value.contents); }
 };

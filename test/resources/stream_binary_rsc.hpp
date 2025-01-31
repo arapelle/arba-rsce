@@ -1,10 +1,10 @@
 #pragma once
 
-#include <string>
-#include <fstream>
 #include <filesystem>
-#include <stdexcept>
 #include <format>
+#include <fstream>
+#include <stdexcept>
+#include <string>
 
 class stream_binary_rsc
 {
@@ -19,19 +19,19 @@ public:
         contents.reserve(stream.tellg());
         stream.seekg(0, std::ios::beg);
         contents.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-        return (contents[0] >= 'a' && contents[0] <= 'z')
-               || (contents[0] >= 'A' && contents[0] <= 'Z');
+        return (contents[0] >= 'a' && contents[0] <= 'z') || (contents[0] >= 'A' && contents[0] <= 'Z');
     }
 
-    bool load_from_file(const std::filesystem::path&)
-    {
-        return false;
-    }
+    bool load_from_file(const std::filesystem::path&) { return false; }
 };
 
-template<> struct std::hash<stream_binary_rsc>
+template <>
+struct std::hash<stream_binary_rsc>
 {
-    std::size_t operator()(stream_binary_rsc const& value) const noexcept { return std::hash<std::string>{}(value.contents); }
+    std::size_t operator()(stream_binary_rsc const& value) const noexcept
+    {
+        return std::hash<std::string>{}(value.contents);
+    }
 };
 
 class throw_stream_binary_rsc
@@ -47,20 +47,20 @@ public:
         contents.reserve(stream.tellg());
         stream.seekg(0, std::ios::beg);
         contents.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-        if (!((contents[0] >= 'a' && contents[0] <= 'z')
-              || (contents[0] >= 'A' && contents[0] <= 'Z')))
+        if (!((contents[0] >= 'a' && contents[0] <= 'z') || (contents[0] >= 'A' && contents[0] <= 'Z')))
         {
             throw std::runtime_error("Problem to load.");
         }
     }
 
-    void load_from_file(const std::filesystem::path&)
-    {
-        throw std::exception();
-    }
+    void load_from_file(const std::filesystem::path&) { throw std::exception(); }
 };
 
-template<> struct std::hash<throw_stream_binary_rsc>
+template <>
+struct std::hash<throw_stream_binary_rsc>
 {
-    std::size_t operator()(throw_stream_binary_rsc const& value) const noexcept { return std::hash<std::string>{}(value.contents); }
+    std::size_t operator()(throw_stream_binary_rsc const& value) const noexcept
+    {
+        return std::hash<std::string>{}(value.contents);
+    }
 };

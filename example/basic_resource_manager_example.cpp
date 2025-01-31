@@ -1,6 +1,7 @@
-#include <iostream>
 #include <arba/rsce/basic_resource_manager.hpp>
+
 #include <fstream>
+#include <iostream>
 
 class text
 {
@@ -22,24 +23,22 @@ public:
 
 namespace std
 {
-template<> struct hash<text>
+template <>
+struct hash<text>
 {
-    std::size_t operator()(text const& value) const noexcept
-    {
-        return std::hash<std::string>{}(value.contents);
-    }
+    std::size_t operator()(text const& value) const noexcept { return std::hash<std::string>{}(value.contents); }
 };
-}
+} // namespace std
 
 int main()
 {
-    std::filesystem::create_directories(std::filesystem::temp_directory_path()/"rsce/rsc");
-    std::ofstream stream(std::filesystem::temp_directory_path()/"rsce/rsc/tale.txt");
+    std::filesystem::create_directories(std::filesystem::temp_directory_path() / "rsce/rsc");
+    std::ofstream stream(std::filesystem::temp_directory_path() / "rsce/rsc/tale.txt");
     stream << "Once upon a time, a mighty spirit...";
     stream.close();
 
     rsce::basic_resource_manager rmanager;
-    const text& tale = rmanager.get<text>(std::filesystem::temp_directory_path()/"rsce/rsc/tale.txt");
+    const text& tale = rmanager.get<text>(std::filesystem::temp_directory_path() / "rsce/rsc/tale.txt");
 
     std::cout << tale.contents << std::endl;
 

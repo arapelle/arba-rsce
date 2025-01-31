@@ -1,11 +1,12 @@
 #pragma once
 
-#include <string>
-#include <fstream>
-#include <filesystem>
-#include <stdexcept>
-#include <format>
 #include <arba/rsce/basic_resource_manager.hpp>
+
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <stdexcept>
+#include <string>
 
 class story_mngr
 {
@@ -21,8 +22,7 @@ public:
         contents.reserve(stream.tellg());
         stream.seekg(0, std::ios::beg);
         contents.assign((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-        if (!((contents[0] >= 'a' && contents[0] <= 'z')
-              || (contents[0] >= 'A' && contents[0] <= 'Z')))
+        if (!((contents[0] >= 'a' && contents[0] <= 'z') || (contents[0] >= 'A' && contents[0] <= 'Z')))
         {
             std::string err_msg = std::format("Problem to load \"{}\" as an input stream.", fpath.generic_string());
             throw std::runtime_error(err_msg);
@@ -30,7 +30,8 @@ public:
     }
 };
 
-template<> struct std::hash<story_mngr>
+template <>
+struct std::hash<story_mngr>
 {
-    std::size_t operator()(text const& value) const noexcept { return std::hash<std::string>{}(value.contents); }
+    std::size_t operator()(story_mngr const& value) const noexcept { return std::hash<std::string>{}(value.contents); }
 };

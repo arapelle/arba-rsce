@@ -2,6 +2,8 @@
 
 #include <arba/vlfs/vlfs.hpp>
 
+#include <fstream>
+
 inline const std::string& koro_contents()
 {
     static const std::string contents = "koro koro\nkoro";
@@ -35,15 +37,15 @@ inline void create_resource_files()
 {
     const std::filesystem::path rsc = rscdir();
 
-    std::ofstream stream(rsc/"koro.txt");
+    std::ofstream stream(rsc / "koro.txt");
     stream << koro_contents();
     stream.close();
 
-    stream.open(rsc/"tiki.txt");
+    stream.open(rsc / "tiki.txt");
     stream << tiki_contents();
     stream.close();
 
-    stream.open(rsc/"invalid.txt");
+    stream.open(rsc / "invalid.txt");
     stream << invalid_contents();
     stream.close();
 }
