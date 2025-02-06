@@ -1,7 +1,8 @@
-#include <iostream>
-#include <arba/rsce/version.hpp>
 #include <arba/rsce/resource_manager.hpp>
+#include <arba/rsce/version.hpp>
+
 #include <fstream>
+#include <iostream>
 
 class text
 {
@@ -23,19 +24,17 @@ public:
 
 namespace std
 {
-template<> struct hash<text>
+template <>
+struct hash<text>
 {
-    std::size_t operator()(text const& value) const noexcept
-    {
-        return std::hash<std::string>{}(value.contents);
-    }
+    std::size_t operator()(text const& value) const noexcept { return std::hash<std::string>{}(value.contents); }
 };
-}
+} // namespace std
 
 int main()
 {
-    std::filesystem::create_directories(std::filesystem::temp_directory_path()/"rsce/rsc");
-    std::ofstream stream(std::filesystem::temp_directory_path()/"rsce/rsc/tale.txt");
+    std::filesystem::create_directories(std::filesystem::temp_directory_path() / "rsce/rsc");
+    std::ofstream stream(std::filesystem::temp_directory_path() / "rsce/rsc/tale.txt");
     stream << "Once upon a time...";
     stream.close();
 
@@ -46,7 +45,10 @@ int main()
 
     rsce::resource_manager rmanager(vlfs);
     const text& tale = rmanager.get<text>("RSC:/tale.txt");
+    const text& tale_2 = rmanager.get<text>(std::filesystem::temp_directory_path() / "rsce/rsc/tale.txt");
     std::cout << tale.contents << std::endl;
+    std::cout << tale_2.contents << std::endl;
 
+    std::cout << "TEST PACKAGE SUCCESS" << std::endl;
     return EXIT_SUCCESS;
 }

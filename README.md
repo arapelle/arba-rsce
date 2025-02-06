@@ -11,20 +11,28 @@ The purpose is to provide resource managing tools in C++.
 ## Requirements
 
 Binaries:
-- A C++20 compiler (ex: g++-10)
+- A C++20 compiler (ex: g++-14)
 - CMake 3.26 or later
 
-Libraries:
-- [arba-core](https://github.com/arapelle/arba-core) 0.20.0
-- [arba-vlfs](https://github.com/arapelle/arba-vlfs) 0.3.0
-
 Testing Libraries (optional):
-- [Google Test](https://github.com/google/googletest) 1.13 or later  (optional)
+- [Google Test](https://github.com/google/googletest) 1.14 or later  (optional)
 
 ## Clone
 
 ```
-git clone https://github.com/arapelle/arba-rsce --recurse-submodules
+git clone https://github.com/arapelle/arba-rsce
+```
+
+## Use with `conan`
+
+Create the conan package.
+```
+conan create . --build=missing -c
+```
+Add a requirement in your conanfile project file.
+```python
+    def requirements(self):
+        self.requires("arba-rsce/0.4.0")
 ```
 
 ## Quick Install
@@ -110,10 +118,6 @@ int main()
 }
 
 ```
-
-## Example - Using *arba-rsce* in a CMake project
-
-See the *basic_cmake_project* example, and more specifically the *CMakeLists.txt* to see how to use *arba-rsce* in your CMake projects.
 
 # License
 

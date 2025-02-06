@@ -2,6 +2,8 @@
 
 #include <arba/vlfs/vlfs.hpp>
 
+#include <fstream>
+
 inline const std::string& koro_contents()
 {
     static const std::string contents = "koro koro\nkoro";
@@ -20,39 +22,23 @@ inline const std::string& invalid_contents()
     return contents;
 }
 
-inline std::filesystem::path rscdir()
+inline const std::filesystem::path& rscdir()
 {
-    static const std::filesystem::path dirpath = []
-    {
-        auto path = std::filesystem::temp_directory_path() / "arba/rsce" / "rsc";
-        std::filesystem::create_directories(path);
-        return path;
-    }();
-    return dirpath;
+    static const std::filesystem::path root_dpath = std::filesystem::path(RSC_PATH);
+    return root_dpath;
 }
 
-inline void create_resource_files()
+inline const std::filesystem::path& textdir()
 {
-    const std::filesystem::path rsc = rscdir();
-
-    std::ofstream stream(rsc/"koro.txt");
-    stream << koro_contents();
-    stream.close();
-
-    stream.open(rsc/"tiki.txt");
-    stream << tiki_contents();
-    stream.close();
-
-    stream.open(rsc/"invalid.txt");
-    stream << invalid_contents();
-    stream.close();
+    static const std::filesystem::path root_dpath = rscdir() / "ut" / "text";
+    return root_dpath;
 }
 
 inline vlfs::virtual_filesystem create_vlfs()
 {
     vlfs::virtual_filesystem vlfs;
-    vlfs.set_virtual_root(strn::string64("TMP"), std::filesystem::temp_directory_path());
-    vlfs.set_virtual_root(strn::string64("RSCE"), "TMP:/arba/rsce");
-    vlfs.set_virtual_root(strn::string64("RSC"), "RSCE:/rsc");
+    vlfs.set_virtual_root(strn::string64("RSC"), rscdir());
+    vlfs.set_virtual_root(strn::string64("UT"), "RSC:/ut");
+    vlfs.set_virtual_root(strn::string64("TEXT"), "UT:/text");
     return vlfs;
 }

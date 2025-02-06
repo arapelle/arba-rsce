@@ -1,6 +1,7 @@
 #pragma once
 
 #include "basic_resource_manager.hpp"
+
 #include <arba/vlfs/vlfs.hpp>
 
 inline namespace arba
@@ -19,8 +20,7 @@ public:
     template <class resource>
     inline std::shared_ptr<resource> get_shared(const std::filesystem::path& rsc_path)
     {
-        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path);
-            path_comps)
+        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path); path_comps)
         {
             return basic_resource_manager::get_shared<resource>(vlfs_->real_path(path_comps));
         }
@@ -38,8 +38,7 @@ public:
     template <class resource>
     inline std::shared_ptr<resource> get_shared(const std::filesystem::path& rsc_path, std::nothrow_t)
     {
-        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path);
-            path_comps)
+        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path); path_comps)
         {
             return basic_resource_manager::get_shared<resource>(vlfs_->real_path(path_comps), std::nothrow);
         }
@@ -71,8 +70,7 @@ public:
     template <class resource>
     inline bool insert(const std::filesystem::path& rsc_path, std::shared_ptr<resource> rsc_sptr)
     {
-        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path);
-            path_comps)
+        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path); path_comps)
         {
             return this->basic_resource_manager::insert<resource>(vlfs_->real_path(path_comps), rsc_sptr);
         }
@@ -90,8 +88,7 @@ public:
     template <class resource>
     inline void set(const std::filesystem::path& rsc_path, std::shared_ptr<resource> rsc_sptr)
     {
-        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path);
-            path_comps)
+        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path); path_comps)
         {
             this->basic_resource_manager::set<resource>(vlfs_->real_path(path_comps), std::move(rsc_sptr));
         }
@@ -110,8 +107,7 @@ public:
     template <class resource>
     inline std::shared_ptr<resource> load(const std::filesystem::path& rsc_path)
     {
-        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path);
-            path_comps)
+        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path); path_comps)
         {
             return basic_resource_manager::load<resource>(vlfs_->real_path(path_comps));
         }
@@ -129,8 +125,7 @@ public:
     template <class resource>
     inline std::shared_ptr<resource> load(const std::filesystem::path& rsc_path, std::nothrow_t)
     {
-        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path);
-            path_comps)
+        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path); path_comps)
         {
             return basic_resource_manager::load<resource>(vlfs_->real_path(path_comps), std::nothrow);
         }
@@ -148,8 +143,7 @@ public:
     template <class resource>
     inline void remove(const std::filesystem::path& rsc_path)
     {
-        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path);
-            path_comps)
+        if (vlfs::virtual_filesystem::path_components path_comps = vlfs_->extract_components(rsc_path); path_comps)
         {
             this->basic_resource_manager::remove<resource>(vlfs_->real_path(path_comps));
         }
@@ -169,5 +163,5 @@ private:
     vlfs::virtual_filesystem* vlfs_ = nullptr;
 };
 
-}
-}
+} // namespace rsce
+} // namespace arba
