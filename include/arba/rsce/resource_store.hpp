@@ -58,8 +58,8 @@ public:
     inline resource_sptr load(const std::filesystem::path& rsc_path, resource_manager_type& rsc_manager);
     inline resource_sptr load(const std::filesystem::path& rsc_path);
 
-    inline bool insert(const std::filesystem::path& rsc_path, resource_sptr resource);
-    inline void set(const std::filesystem::path& rsc_path, resource_sptr resource);
+    inline bool insert(const std::filesystem::path& rsc_path, resource_sptr rsc_sptr);
+    inline void set(const std::filesystem::path& rsc_path, resource_sptr rsc_sptr);
     inline void remove(const std::filesystem::path& rsc_path);
 
 private:
@@ -184,19 +184,19 @@ default_resource_store<resource_type>::emplace_if_valid_(const std::filesystem::
 }
 
 template <class resource_type>
-bool default_resource_store<resource_type>::insert(const std::filesystem::path& rsc_path, resource_sptr resource)
+bool default_resource_store<resource_type>::insert(const std::filesystem::path& rsc_path, resource_sptr rsc_sptr)
 {
-    assert(resource);
+    assert(rsc_sptr);
     std::lock_guard lock(mutex_);
-    return resources_.insert(typename resource_dico::value_type(rsc_path, std::move(resource))).second;
+    return resources_.insert(typename resource_dico::value_type(rsc_path, std::move(rsc_sptr))).second;
 }
 
 template <class resource_type>
-void default_resource_store<resource_type>::set(const std::filesystem::path& rsc_path, resource_sptr resource)
+void default_resource_store<resource_type>::set(const std::filesystem::path& rsc_path, resource_sptr rsc_sptr)
 {
-    assert(resource);
+    assert(rsc_sptr);
     std::lock_guard lock(mutex_);
-    resources_[rsc_path] = std::move(resource);
+    resources_[rsc_path] = std::move(rsc_sptr);
 }
 
 template <class resource_type>

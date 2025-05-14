@@ -32,7 +32,7 @@ conan create . --build=missing -c
 Add a requirement in your conanfile project file.
 ```python
     def requirements(self):
-        self.requires("arba-rsce/0.4.0")
+        self.requires("arba-rsce/0.5.0")
 ```
 
 ## Quick Install
